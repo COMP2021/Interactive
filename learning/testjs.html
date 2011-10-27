@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <title>Testjs</title>
+    <style type="text/css">
+      #menu li {
+        float: left;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    </style>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var set_name = function() {
+          var name = $("#name_input").val();
+          if (name != '') {
+            // $("#name_display").text("Your name is: " + name);
+            $("#dialog").dialog("close");
+          } else {
+            // TODO refuse close
+          }
+        };
+
+        var dialogOpts = {
+          buttons: {
+            "Ok": set_name,
+          }
+        };
+
+        var show_dialog = function() {
+          $("#dialog").dialog(
+            dialogOpts,
+            {
+              modal: true,
+              resizable: false,
+            }
+          );
+          $(".ui-dialog-titlebar").hide(); // hide the title bar
+        };
+
+        var context;
+
+        var init_canvas = function() {
+          var draw = false;
+          var canvas = document.getElementById("canvas");
+          context = canvas.getContext("2d");
+          $("#canvas").mousedown(function() {
+            draw = true;
+          });
+          $("#canvas").mouseup(function() {
+            draw = false;
+          });
+          $("#canvas").mousemove(function(e) {
+            if (draw) {
+              context.lineWidth = 15;
+              context.beginPath();
+              context.moveTo(e.pageX,e.pageY);
+              context.lineTo(e.pageX+1,e.pageY+1);
+              context.stroke();
+            }
+          });
+        };
+
+        var change_color = function() {
+          context.strokeStyle = 'red';
+        };
+
+        var init_buttons = function() {
+          $("#cn_button").button();
+          $("#cn_button").click(function() {
+            show_dialog();
+          });
+          $("#color_button").button();
+          $("#color_button").click(function() {
+            change_color();
+          });
+        };
+
+        var init_menu = function() {
+          $("#menu").menu();
+        };
+
+        init_menu();
+        init_buttons();
+        init_canvas();
+        show_dialog();
+      });
+    </script>
+  </head>
+  <body>
+    <ul id="menu">
+      <li>File</li>
+      <li>Edit</li>
+      <li>Tools</li>
+      <li>View</li>
+      <li>Options</li>
+      <li>About</li>
+    </ul>
+    <div id="dialog">
+      <p>Enter your name</p>
+      <input id="name_input" type="text"/>
+    </div>
+    <br />
+    <canvas id="canvas" width="800" height="600"></canvas><br />
+    <div id="cn_button">Change name</div>
+    <div id="color_button">Change Color</div>
+  </body>
+</html>
