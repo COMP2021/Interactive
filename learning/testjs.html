@@ -7,6 +7,11 @@
         padding-left: 20px;
         padding-right: 20px;
       }
+      canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
     </style>
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
@@ -46,6 +51,25 @@
           var draw = false;
           var canvas = document.getElementById("canvas");
           context = canvas.getContext("2d");
+
+          context.lineWidth = 15;
+          context.beginPath();
+          context.moveTo(100, 100);
+          context.lineTo(300, 300);
+          context.stroke();
+
+          var layer1 = document.getElementById("layer1");
+          layer_ctx = layer1.getContext("2d");
+
+          layer_ctx.globalAlpha = 0.5;
+          layer_ctx.strokeStyle = "#FF0000";
+          layer_ctx.lineWidth = 15;
+          layer_ctx.beginPath();
+          layer_ctx.moveTo(100, 300);
+          layer_ctx.lineTo(300, 100);
+          layer_ctx.stroke();
+
+
           $("#canvas").mousedown(function() {
             draw = true;
           });
@@ -90,6 +114,7 @@
     </script>
   </head>
   <body>
+  <!--
     <ul id="menu">
       <li>File</li>
       <li>Edit</li>
@@ -103,8 +128,12 @@
       <input id="name_input" type="text"/>
     </div>
     <br />
-    <canvas id="canvas" width="800" height="600"></canvas><br />
+  -->
+    <canvas id="canvas" width="1000" height="800"></canvas><br />
+    <canvas id="layer1" width="1000" height="800"></canvas><br />
+  <!--
     <div id="cn_button">Change name</div>
     <div id="color_button">Change Color</div>
+  -->
   </body>
 </html>

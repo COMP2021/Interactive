@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript">
+      if ( WebSocket.__initialize ) {
+        WebSocket.__swfLocation = 'web-socket-js/WebSocketMain.swf';
+      }
+
+      var ws;
+
+      function init_socket() {
+        ws = new WebSocket('ws://143.89.218.59:3000/server');
+
+        ws.onopen = function() {
+          var action = {
+            action: "new user",
+            username: "shabi"
+          };
+          ws.send(JSON.stringify(action));
+          init_canvas();
+        };
+
+        ws.onmessage = function(e) { // when the client receives a message
+
+          $("#message").html(e.data);
+          /*
+          cxt.strokeStyle = '#FF0000';
+          cxt.lineWidth = 2;
+          cxt.beginPath();
+          cxt.moveTo(x1, y1);
+          cxt.lineTo(x2, y2);
+          cxt.stroke();
+          cxt.closePath();
+          */
+        };
+
+        ws.onclose = function() { // when socket is closed, do nothing now
+
+        };
+      }
+
+      function init_canvas() {
+        $("#canvas").mousedown(canvas_mousedown);
+        $("#canvas").mouseup(canvas_mousedown);
+        $("#canvas").mousemove(canvas_mousedown);
+      }
+
+      /**
+       * Adds a canvas between the user canvas and the mouse detection canvas
+       */
+      function add_canvas(canvas_id) {
+        $("#canvas_container").append("<canvas id=\"new_layer\" " + 
+            "width=\"800\" height=\"600\"></canvas>");
+        $("#new_layer").attr("id", "layer" + String(canvas_id));
+      }
+
+      function canvas_mousedown(e) {
+        var paint_action = {
+          action: "draw",
+          userid: 1,
+          shape: "rect",
+          start: [100, 100],
+          end: [200, 200],
+          fg: [255, 0, 0],
+          bg: [0, 255, 0],
+          width: 3,
+          fill: 0
+        };
+        ws.send(JSON.stringify(paint_action));
+      }
+
+      function canvas_mouseup(e) {
+      }
+
+      function canvas_mousemove(e) {
+        /*
+        var x_pos = e.clientX - c.offsetLeft;
+        var y_pos = e.clientY - c.offsetTop;
+        var pos_str = x_pos.toString() + " " + y_pos.toString();
+        ws.send(pos_str);
+        */
+      }
+
+      $(document).ready(function() {
+        init_socket();
+      });
+    </script>
+  </head>
+  <body>
+    <div id="message"></div>
+    <div id="canvas_container">
+      <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+  </body>
+</html>

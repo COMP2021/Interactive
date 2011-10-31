@@ -1,0 +1,93 @@
+\documentclass[a4paper,11pt,twocolumn]{article}
+\usepackage{parskip}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\topmargin -1.5cm
+\oddsidemargin -0.04cm
+\evensidemargin -0.04cm
+\textwidth 16.59cm
+\textheight 25cm
+
+\title{
+  Design and Implementation of an Interactive Painter\\
+}
+
+\author{
+  GUO Yuxiang, WU Sisi, ZHANG Yaofeng, ZHANG Yusi, ZHAO Guanlun
+}
+
+\begin{document}
+
+\maketitle
+
+\abstract{}
+
+The Interactive Painter is an online application that allows multiple users to
+interactively paint on one canvas and communicate with each other at the same
+time. Based on the web socket mechanism, this application works quite
+efficiently and can deal with relatively large amount of data transfer. The
+design and development of this web application is motivated by Google Docs,
+which is a convenient platform for collaborations. Since a graphical version
+is not available, we started this project to design and implement this
+painter.
+
+\section{Basic Idea}
+
+Here we briefly explains how the application works in the perspective of a
+user.
+
+When the user enters the website, he/she will be prompted either to join an
+existing workspace or create a new one. If the user choose to create a new
+workspace, an instance of a workspace will be created in the server side,
+otherwise all the existing data will be passed to the client side browser and
+the existing canvas will be constructed according to the data from the server
+side (This part will be covered shortly).
+
+When the user has entered the workspace, he/she can do the following: to draw
+on the canvas, to chat with other painters through messages, to save and
+download the work, or many others. These different activities will be
+converted into a string that contains the relevant message and passed to the
+server through the same interface.
+
+The server receives the data from the clients, parse the string and deal with
+the different requests by calling different methods. The methods accept a
+string and update the server-side data and then return a new string which will
+be sent back to the clients.
+
+After receiving the data the server sends back, the web browser draws on the
+canvas and all the users can simultaneously see the updates of other painters.
+
+\section{Framework}
+
+Thanks to the emerging of HTML5 canvas, which is a nice platform for
+developing various browser-based graphical applications, our project can start
+much easier than in the dark, old days when the similar functionalities have to be
+implemented by Flash of SVG. The canvas mechanism provides a lot of handy APIs
+that can easily be adopted.
+
+The new HTML5 also provides built-in support for web socket, which is an
+efficient and user-friendly communication tool for data transfer. Now the web
+socket is directly accessible from Javascript. However, one important drawback
+of the build-in web socket APIs is that they are now available for only a few
+web browsers, including Google Chrome, Chromium, and Safari, not even
+Mozilla Firefox (up till now), since the common agreement of HTML5 standard
+has not been reached yet.
+
+The server side is implemented using the Perl web framework of Mojolicious,
+which provide some useful APIs for web programming, including web socket.
+Mojolicious works quite efficiently when large amount of data need to be
+transfered.
+
+\section{Design}
+
+Coming back to the client side, we have to draw the lines and shapes on the
+canvas. Since we need to deal with a lot of different situations (covered
+later), we apply a special structure to this application. All the users share
+a common canvas that contains the "static" part of the canvas, and at the same
+time each user has a transparent layer, which is also a canvas, to draw
+his/her most recent 
+
+
+
+\end{document}
