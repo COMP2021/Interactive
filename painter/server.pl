@@ -8,6 +8,7 @@ use Workspace;
 
 # our %workspaces = ();
 our %clients = ();
+# this uses the same id as the hashtable %clients, stores a buffer of the current line seg
 our %userbuffer = ();
 # database used to store the line drawn
 our @draw_db = ();
@@ -63,14 +64,32 @@ sub exec_draw_req {
   return $data;
 }
 
+sub exec_beginseg_req {
+# TODO
+  # Here we should also put the data in the client's buffer into the shared database, 
+  # if just performed undo, do not push it in, merely replace it with a new line seg,
+  # and we also need to rearrange the order of the canvases here.
+}
+
+sub exec_endseg_req {
+# TODO
+  # Here we should end the seg
+}
+
 # deals with the msg for undoing
 sub exec_undo_req {
   my @items = @_;
+# TODO
+  # send the clients a msg to clear the canvas but keep the buffer unchanged
+  # also set a flag to indicate that we performed undo
 }
 
 # deals with the msg for redoing
 sub exec_redo_req {
   my @items = @_;
+# TODO
+  # send the clients a msg to restore the canvas we cleared
+  # also trun off the flag to indicate that we have not ust performed undo
 }
 
 # accepts a message as arg and call different methods according to the type,
@@ -111,14 +130,18 @@ sub send_msg_to_clients {
 websocket '/server' => sub {
   my $self = shift; # $self is the current client
 
+  # connection established
   my $client_id = $client_cnt;
   $clients{$client_id} = $self;
   $client_cnt++;
   
+  # connection closed
   $self->on_finish(sub {
     delete $clients{$client_id};
   });
 
+  # The following is the server/client interface:
+  # get the messages from the clients and send messages to them
   $self->on_message(sub { # when receiving a message from the client
     my ($self, $message) = @_; # get the value of the client and the message
     my $msg_back = exec_msg($message, $client_id);

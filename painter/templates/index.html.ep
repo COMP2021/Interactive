@@ -68,6 +68,8 @@
       }
 
       function canvas_mousedown(e) {
+        /*
+        dummy code just for testing:
         var action = {
           action: "draw",
           userid: 1,
@@ -80,17 +82,25 @@
           fill: 0
         };
         ws.send(JSON.stringify(action));
+        */
+
+      // TODO 
+        // Here we should send a message start_msg to notify the server the do the following:
+        // 1. push the buffer into the database or delete the buffer (if just undoed)
+        // 2. put the user's canvas at the top of all the canvases
       }
 
       function canvas_mouseup(e) {
+      // TODO
+        // Here we should notify the server that the line seg has ended
       }
 
       function canvas_mousemove(e) {
+      // TODO
+        // Here we should send consecutive msgs to the server for updating
         /*
         var x_pos = e.clientX - c.offsetLeft;
         var y_pos = e.clientY - c.offsetTop;
-        var pos_str = x_pos.toString() + " " + y_pos.toString();
-        ws.send(pos_str);
         */
       }
 
