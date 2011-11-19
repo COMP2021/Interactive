@@ -2,7 +2,9 @@
 <html>
   <head>
     <title>Test</title>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript">
       if ( WebSocket.__initialize ) {
         WebSocket.__swfLocation = 'web-socket-js/WebSocketMain.swf';
@@ -11,20 +13,25 @@
       var ws;
 
       function init_socket() {
-        ws = new WebSocket('ws://143.89.218.59:3000/server');
+        ws = new WebSocket('ws://143.89.218.59:3389/server');
 
         ws.onopen = function() {
           var action = {
-            action: "new user",
-            username: "shabi"
+            action: "new_user",
+            username: $("#name_input").val()
           };
           ws.send(JSON.stringify(action));
           init_canvas();
         };
 
         ws.onmessage = function(e) { // when the client receives a message
-
-          $("#message").html(e.data);
+          var data = jQuery.parseJSON(e.data);
+          var action = data.action;
+          if (action == "new_canvas") { // add new canvas
+            add_canvas(data.userid);
+          } else if (action == "draw" ) { // draw
+            draw_canvas(data);
+          }
           /*
           cxt.strokeStyle = '#FF0000';
           cxt.lineWidth = 2;
@@ -43,8 +50,8 @@
 
       function init_canvas() {
         $("#canvas").mousedown(canvas_mousedown);
-        $("#canvas").mouseup(canvas_mousedown);
-        $("#canvas").mousemove(canvas_mousedown);
+        $("#canvas").mouseup(canvas_mouseup);
+        $("#canvas").mousemove(canvas_mousemove);
       }
 
       /**
@@ -56,8 +63,12 @@
         $("#new_layer").attr("id", "layer" + String(canvas_id));
       }
 
+      function draw_canvas(data) {
+        console.log("drawing");
+      }
+
       function canvas_mousedown(e) {
-        var paint_action = {
+        var action = {
           action: "draw",
           userid: 1,
           shape: "rect",
@@ -68,7 +79,7 @@
           width: 3,
           fill: 0
         };
-        ws.send(JSON.stringify(paint_action));
+        ws.send(JSON.stringify(action));
       }
 
       function canvas_mouseup(e) {
@@ -83,15 +94,64 @@
         */
       }
 
+      function login() {
+        var set_name = function() {
+          var name = $("#name_input").val();
+          if (name != '') {
+            $("#name_dialog").dialog("close");
+            $("#top_bar").html("<p>" + $("#name_input").val() + "</p>");
+            init_socket();
+          } else {
+            // do nothing
+          }
+        };
+
+        var dialogOpts = { // options
+          buttons: {
+            "Ok": set_name,
+          }
+        };
+
+        var show_dialog = function() {
+          $("#name_dialog").dialog(
+            dialogOpts,
+            {
+              modal: true,
+              resizable: false,
+            }
+          );
+          $(".ui-dialog-titlebar").hide(); // hide the title bar
+        };
+        show_dialog();
+      }
+
       $(document).ready(function() {
-        init_socket();
+        login();
       });
     </script>
+    <style type="text/css">
+      #top_bar {
+        background-color:#333;
+        padding-left:25px;
+        margin:-22px;
+      }
+      #top_bar p {
+        font-size:22px;
+        color:#FFF;
+        font-family:"Sans-serif";
+      }
+    </style>
   </head>
   <body>
-    <div id="message"></div>
+    <div id="top_bar"><p>&nbsp;</p></div>
+    <div id="title_bar">
+    </div>
     <div id="canvas_container">
       <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+    <div id="name_dialog">
+      <p>Enter your name</p>
+      <input id="name_input" type="text"/>
     </div>
   </body>
 </html>
