@@ -3,15 +3,9 @@
 use Mojolicious::Lite;
 use Mojo::JSON;
 
-use UserData;
-use Workspace;
+require "database.pl";
 
-# our %workspaces = ();
 our %clients = ();
-# this uses the same id as the hashtable %clients, stores a buffer of the current line seg
-our %userbuffer = ();
-# database used to store the line drawn
-our @draw_db = ();
 
 # our $workspace_id = 0;
 our $client_cnt = 0;
@@ -28,22 +22,16 @@ sub on_connect {
 
 # initialize the canvas
 sub on_enter_wksp {
-  # add a canvas to each clients' page
+  # add a canvas to each client's page
 }
 
 # when the user leaves
 sub on_finish {
 }
 
-# map the fields of the message to the indices of the parsed array
-sub map_field_to_idx {
-  # create a hashtable here for mapping
-}
-
 # deal with adding new users
 sub exec_new_user_req {
   my ($username, $client_id) = @_;
-  print "$username $client_id\n";
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "new_canvas",
@@ -61,6 +49,11 @@ sub exec_draw_req {
     userid => $userid,
     shape => $shape,
   });
+  if ($shape eq "pen") {
+    append_to_buffer($userid, $data);
+  } else {
+    set_buffer($userid, $data);
+  }
   return $data;
 }
 
@@ -69,6 +62,11 @@ sub exec_beginseg_req {
   # Here we should also put the data in the client's buffer into the shared database, 
   # if just performed undo, do not push it in, merely replace it with a new line seg,
   # and we also need to rearrange the order of the canvases here.
+  my ($userid, $undoed) = @_;
+  if (!$undoed) { # not undo performed
+    buffer2db($userid);
+  }
+  dump_buffer($userid);
 }
 
 sub exec_endseg_req {
@@ -114,6 +112,11 @@ sub exec_msg {
         $data->{"bg"}, 
         $data->{"width"}, 
         $data->{"fill"}
+    );
+  } elsif ($action eq "begin_seg") { # starting a new seg at mouseclick
+    exec_beginseg_req(
+        $data->{"userid"},
+        $data->{"undoed"}
     );
   }
 }

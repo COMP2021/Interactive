@@ -6,11 +6,22 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript">
+      var ws; // global websocket
+
+      // Following are the global variables describing the user's current state,
+      // when changing the properties using the toolbar or others, just update
+      // these variables
+      var username_g; // name of the user
+      var userid_g; // id of the user
+      var currtool_g; // the tool (shape) the user is using
+      var currfg_g; // the current foreground color
+      var currbg_g; // the current background color
+      var currfill_g; // whether to fill or not
+      var currwidth_g; // the current width of line
+
       if ( WebSocket.__initialize ) {
         WebSocket.__swfLocation = 'web-socket-js/WebSocketMain.swf';
       }
-
-      var ws;
 
       function init_socket() {
         ws = new WebSocket('ws://143.89.218.59:3389/server');
@@ -18,7 +29,7 @@
         ws.onopen = function() {
           var action = {
             action: "new_user",
-            username: $("#name_input").val()
+            username: username_g
           };
           ws.send(JSON.stringify(action));
           init_canvas();
@@ -28,7 +39,8 @@
           var data = jQuery.parseJSON(e.data);
           var action = data.action;
           if (action == "new_canvas") { // add new canvas
-            add_canvas(data.userid);
+            userid_g = data.userid;
+            add_canvas(userid_g);
           } else if (action == "draw" ) { // draw
             draw_canvas(data);
           }
@@ -49,9 +61,11 @@
       }
 
       function init_canvas() {
+        /*
         $("#canvas").mousedown(canvas_mousedown);
         $("#canvas").mouseup(canvas_mouseup);
         $("#canvas").mousemove(canvas_mousemove);
+        */
       }
 
       /**
@@ -68,26 +82,16 @@
       }
 
       function canvas_mousedown(e) {
-        /*
-        dummy code just for testing:
-        var action = {
-          action: "draw",
-          userid: 1,
-          shape: "rect",
-          start: [100, 100],
-          end: [200, 200],
-          fg: [255, 0, 0],
-          bg: [0, 255, 0],
-          width: 3,
-          fill: 0
-        };
-        ws.send(JSON.stringify(action));
-        */
-
       // TODO 
         // Here we should send a message start_msg to notify the server the do the following:
         // 1. push the buffer into the database or delete the buffer (if just undoed)
         // 2. put the user's canvas at the top of all the canvases
+        var action = {
+          action: "begin_seg",
+          userid: 1,
+          undoed: 0
+        };
+        ws.send(JSON.stringify(action));
       }
 
       function canvas_mouseup(e) {
@@ -109,7 +113,8 @@
           var name = $("#name_input").val();
           if (name != '') {
             $("#name_dialog").dialog("close");
-            $("#top_bar").html("<p>" + $("#name_input").val() + "</p>");
+            username_g = name;
+            $("#top_bar").html("<p>" + name + "</p>");
             init_socket();
           } else {
             // do nothing
@@ -138,6 +143,22 @@
       $(document).ready(function() {
         login();
       });
+
+      // for debugging only
+      function send_req() {
+        var action = {
+          action: "draw",
+          userid: 1,
+          shape: "pen",
+          start: [100, 100],
+          end: [200, 200],
+          fg: [255, 0, 0],
+          bg: [0, 255, 0],
+          width: 3,
+          fill: 0
+        };
+        ws.send(JSON.stringify(action));
+      }
     </script>
     <style type="text/css">
       #top_bar {
