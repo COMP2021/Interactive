@@ -36,29 +36,28 @@
         ws = new WebSocket('ws://143.89.218.59:3389/server');
 
         ws.onopen = function() {
-          var action1 = { // new a user
+          var action = { // new a user
             action: "new_user",
             username: username_g
           };
-          ws.send(JSON.stringify(action1));
-          var action2 = { // new a canvas
-            action: "request_canvas",
-            username: username_g
-          };
-          ws.send(JSON.stringify(action2));
+          ws.send(JSON.stringify(action));
         };
 
         ws.onmessage = function(e) { // when the client receives a message
           var data = jQuery.parseJSON(e.data);
           var action = data.action;
           if (action == "new_user") { // only for the first login
-            console.log(e.data);
-            userid_g = data.userid; // assign an id to the user
             init_detector();
+            userid_g = data.userid; // assign an id to the user
+            for (var i = 0; i < data.allid.length; i++) {
+              add_canvas(data.allid[i]); // add the existing canvases
+            }
           } else if (action == "new_canvas") { // add new canvas
             add_canvas(data.userid);
           } else if (action == "draw" ) { // draw
             draw_canvas(data);
+          } else if (action == "begin_seg") {
+            move_canvas_to_top(data.userid);
           }
         };
 
@@ -76,13 +75,17 @@
       }
 
       function add_canvas(canvas_id) {
-        $("<canvas id=\"new_layer\" width=\"800\"height=\"600\"></canvas>").insertAfter($("#canvas"));
-        $("#new_layer").attr("id", "layer" + canvas_id);
+        console.log(canvas_id);
+        $("<canvas id=\"layer" + canvas_id + "\" width=\"800\"height=\"600\"></canvas>")
+            .insertAfter($("#canvas"));
+      }
+
+      function move_canvas_to_top(canvas_id) {
+        $("#layer" + canvas_id).insertBefore($("#detector"));
       }
 
       function draw_canvas(data) {
         if (data.shape == "pen") {
-          console.log(data.userid);
           var cxt = $("#layer" + data.userid).get(0).getContext('2d');
           var color = "#" + data.fg[0].toString(16) + 
               data.fg[1].toString(16) + data.fg[2].toString(16);

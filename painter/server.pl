@@ -3,6 +3,8 @@
 use Mojolicious::Lite;
 use Mojo::JSON;
 
+use Client;
+
 require "database.pl";
 
 our %clients = ();
@@ -31,24 +33,28 @@ sub on_finish {
 
 # deal with adding new users
 sub exec_new_user_req {
-  my ($username, $client_id, @all_id) = @_;
-  my $json = Mojo::JSON->new;
-  my $data = $json->encode( {
-    action => "new_user",
-    userid => $client_id,
-    allids => \@all_id
-  });
-  return $data;
-}
-
-sub exec_request_canvas_req {
   my ($username, $client_id) = @_;
   my $json = Mojo::JSON->new;
-  my $data = $json->encode( {
-    action => "new_canvas",
-    userid => $client_id
+  my @allids = ();
+  # first part: send back to the new user
+  foreach my $id (keys(%clients)) {
+    if ($id != $client_id) {
+      push(@allids, $id);
+    }
+  }
+  my $data_user= $json->encode( {
+    action => "new_user",
+    userid => $client_id,
+    allid => \@allids
   });
-  return $data;
+  $clients{$client_id}->get_wsclient()->send_message($data_user); # send all the canvases to the new user
+
+  # send part: send to all the users
+  my $data_canvas = $json->encode( {
+    action => "new_canvas",
+    userid => $client_id,
+  });
+  return $data_canvas;
 }
 
 # deals with the msg for painting, returns the msg to be sent back
@@ -84,6 +90,13 @@ sub exec_beginseg_req {
     buffer2db($userid);
   }
   dump_buffer($userid);
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "begin_seg",
+    userid => $userid,
+    undoed => $undoed
+  });
+  return $data;
 }
 
 sub exec_endseg_req {
@@ -118,12 +131,6 @@ sub exec_msg {
     return exec_new_user_req(
         $data->{"username"},
         $client_id,
-        keys(%clients)
-    );
-  } elsif ($action eq "request_canvas") { # new canvas request
-    return exec_request_canvas_req(
-        $data->{"username"},
-        $client_id
     );
   } elsif ($action eq "draw") { # drawing request
     return exec_draw_req(
@@ -145,10 +152,10 @@ sub exec_msg {
 }
 
 # send the message to the clients, does not create or modify the message
-sub send_msg_to_clients {
+sub send_msg_to_all {
   my ($message) = @_;
   while ((my $id, my $client) = each(%clients)) {
-    $client->send_message($message);
+    $client->get_wsclient()->send_message($message);
   }
 }
 
@@ -158,7 +165,8 @@ websocket '/server' => sub {
 
   # connection established
   my $client_id = $client_cnt;
-  $clients{$client_id} = $self;
+  my $clt = new Client($self, "shabi", $client_id);
+  $clients{$client_id} = $clt;
   $client_cnt++;
 
   # connection closed
@@ -171,7 +179,7 @@ websocket '/server' => sub {
   $self->on_message(sub { # when receiving a message from the client
     my ($self, $message) = @_; # get the value of the client and the message
     my $msg_back = exec_msg($message, $client_id);
-    send_msg_to_clients($msg_back);
+    send_msg_to_all($msg_back);
   });
 };
 
