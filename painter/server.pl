@@ -31,6 +31,17 @@ sub on_finish {
 
 # deal with adding new users
 sub exec_new_user_req {
+  my ($username, $client_id, @all_id) = @_;
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "new_user",
+    userid => $client_id,
+    allids => \@all_id
+  });
+  return $data;
+}
+
+sub exec_request_canvas_req {
   my ($username, $client_id) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
@@ -42,12 +53,18 @@ sub exec_new_user_req {
 
 # deals with the msg for painting, returns the msg to be sent back
 sub exec_draw_req {
-  my ($userid, $shape, @start, @end, @fg, @bg, $width, $fill) = @_;
+  my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "draw",
     userid => $userid,
     shape => $shape,
+    start => $start,
+    end => $end,
+    fg => $fg,
+    bg => $bg,
+    width => $width,
+    fill => $fill
   });
   if ($shape eq "pen") {
     append_to_buffer($userid, $data);
@@ -99,7 +116,13 @@ sub exec_msg {
   my $action = $data->{"action"};
   if ($action eq "new_user") { # new user request
     return exec_new_user_req(
-        $data->{"username"}, 
+        $data->{"username"},
+        $client_id,
+        keys(%clients)
+    );
+  } elsif ($action eq "request_canvas") { # new canvas request
+    return exec_request_canvas_req(
+        $data->{"username"},
         $client_id
     );
   } elsif ($action eq "draw") { # drawing request
@@ -137,7 +160,7 @@ websocket '/server' => sub {
   my $client_id = $client_cnt;
   $clients{$client_id} = $self;
   $client_cnt++;
-  
+
   # connection closed
   $self->on_finish(sub {
     delete $clients{$client_id};

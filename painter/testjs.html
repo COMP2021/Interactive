@@ -59,9 +59,8 @@
           context.stroke();
 
           var layer1 = document.getElementById("layer1");
-          layer_ctx = layer1.getContext("2d");
+          var layer_ctx = layer1.getContext("2d");
 
-          layer_ctx.globalAlpha = 0.5;
           layer_ctx.strokeStyle = "#FF0000";
           layer_ctx.lineWidth = 15;
           layer_ctx.beginPath();
@@ -77,6 +76,7 @@
             draw = false;
           });
           $("#canvas").mousemove(function(e) {
+            console.log("moving");
             if (draw) {
               context.lineWidth = 15;
               context.beginPath();
@@ -127,10 +127,8 @@
       <input id="name_input" type="text"/>
     </div>
     <br />
-    <!--
     <canvas id="canvas" width="1000" height="800"></canvas><br />
     <canvas id="layer1" width="1000" height="800"></canvas><br />
-    -->
     <div id="cn_button">Change name</div>
     <div id="color_button">Change Color</div>
   </body>

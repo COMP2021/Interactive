@@ -23,7 +23,6 @@ sub append_to_buffer {
   } else { # the buffer is empty
     set_buffer($user_id, $data);
   }
-  print "$buffer{$user_id}\n";
 }
 
 # push the data in the buffer into the database
