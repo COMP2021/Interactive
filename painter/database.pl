@@ -48,6 +48,7 @@ sub get_db {
 
 # return all the buffers
 sub get_all_buffer {
+  return %buffer;
 }
 
 # print the info of the database, for debugging
@@ -64,7 +65,10 @@ sub print_buffer {
 }
 
 # print all, for debugging
-sub print_all {
+sub print_all_buffer {
+  foreach my $key (keys(%buffer)) {
+    print_buffer($key);
+  }
 }
 
 1;

@@ -31,6 +31,27 @@ sub on_enter_wksp {
 sub on_finish {
 }
 
+sub parse_database {
+  my @seg_db = get_db();
+  my @segs = ();
+  foreach my $datum (@seg_db) {
+    if ($datum) {
+      foreach my $seg (split(/\|/, $datum)) {
+        push(@segs, $seg);
+      }
+    }
+  }
+  my %buffer = get_all_buffer();
+  foreach my $key (keys(%buffer)) {
+    if ($buffer{$key}) {
+      foreach my $seg (split(/\|/, $buffer{$key})) {
+        push(@segs, $seg);
+      }
+    }
+  }
+  return @segs;
+}
+
 # deal with adding new users
 sub exec_new_user_req {
   my ($username, $client_id) = @_;
@@ -42,10 +63,12 @@ sub exec_new_user_req {
       push(@allids, $id);
     }
   }
+  my @segs = parse_database();
   my $data_user= $json->encode( {
     action => "new_user",
     userid => $client_id,
-    allid => \@allids
+    allid => \@allids,
+    segs => \@segs
   });
   $clients{$client_id}->get_wsclient()->send_message($data_user); # send all the canvases to the new user
 
