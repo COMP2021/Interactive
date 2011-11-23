@@ -41,7 +41,7 @@ sub parse_database_and_buffer {
       }
     }
   }
-  my %buffers = get_all_buffer();
+  my %buffers = get_all_buffers();
   foreach my $key (keys(%buffers)) {
     if ($buffers{$key}) {
       foreach my $seg (split(/\|/, $buffers{$key})) {
@@ -111,6 +111,7 @@ sub exec_new_user_req {
 
 # deals with the msg for painting, returns the msg to be sent back
 sub exec_draw_req {
+  # tttv means "tentative" fuck you lunba... = =
   my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill, $tttv) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {

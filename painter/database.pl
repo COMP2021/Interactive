@@ -3,7 +3,7 @@
 use strict;
 
 # this uses the same id as the hashtable %clients, stores a buffer of the current line seg
-our %buffer = ();
+our %buffers = ();
 
 # database used to store the line drawn
 our @seg_db = ();
@@ -24,7 +24,6 @@ sub append_to_buffer {
     set_buffer($user_id, $data);
   }
 }
-  my @segs = ();
 
 # push the data in the buffer into the database
 sub buffer2db {
@@ -53,8 +52,8 @@ sub get_buffer {
 }
 
 # return all the buffers
-sub get_all_buffer {
-  return %buffer;
+sub get_all_buffers {
+  return %buffers;
 }
 
 # print the info of the database, for debugging
@@ -72,7 +71,7 @@ sub print_buffer {
 
 # print all, for debugging
 sub print_all_buffer {
-  foreach my $key (keys(%buffer)) {
+  foreach my $key (keys(%buffers)) {
     print_buffer($key);
   }
 }
