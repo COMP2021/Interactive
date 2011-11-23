@@ -28,4 +28,9 @@ sub get_cid {
   return $self->{_cid};
 }
 
+sub set_cname {
+  my ($self, $name) = @_;
+  $self->{_cname} = $name;
+}
+
 1;

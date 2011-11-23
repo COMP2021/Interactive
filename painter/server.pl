@@ -31,7 +31,7 @@ sub on_enter_wksp {
 sub on_finish {
 }
 
-sub parse_database {
+sub parse_database_and_buffer {
   my @seg_db = get_db();
   my @segs = ();
   foreach my $datum (@seg_db) {
@@ -41,12 +41,24 @@ sub parse_database {
       }
     }
   }
-  my %buffer = get_all_buffer();
-  foreach my $key (keys(%buffer)) {
-    if ($buffer{$key}) {
-      foreach my $seg (split(/\|/, $buffer{$key})) {
+  my %buffers = get_all_buffer();
+  foreach my $key (keys(%buffers)) {
+    if ($buffers{$key}) {
+      foreach my $seg (split(/\|/, $buffers{$key})) {
         push(@segs, $seg);
       }
+    }
+  }
+  return @segs;
+}
+
+sub parse_buffer {
+  my $userid = $_[0];
+  my @segs = ();
+  my $buffer = get_buffer($userid);
+  if ($buffer) {
+    foreach my $seg (split(/\|/, $buffer)) {
+      push(@segs, $seg);
     }
   }
   return @segs;
@@ -57,15 +69,32 @@ sub exec_new_user_req {
   my ($username, $client_id) = @_;
   my $json = Mojo::JSON->new;
   my @allids = ();
+  foreach my $key (keys(%clients)) {
+    if ($clients{$key}->get_cname() eq $username) { # username already in use
+      my $data_negative = $json->encode( {
+        action => "new_user",
+        permission => 0,
+      });
+      $clients{$client_id}->get_wsclient()->send_message($data_negative); # send back msg without permission
+      my $data_invalid = $json->encode( {
+        action => "new_canvas",
+        userid => -1
+      });
+      delete $clients{$client_id};
+      return "";
+    }
+  }
+  $clients{$client_id}->set_cname($username);
   # first part: send back to the new user
   foreach my $id (keys(%clients)) {
     if ($id != $client_id) {
       push(@allids, $id);
     }
   }
-  my @segs = parse_database();
-  my $data_user= $json->encode( {
+  my @segs = parse_database_and_buffer();
+  my $data_user = $json->encode( {
     action => "new_user",
+    permission => 1,
     userid => $client_id,
     allid => \@allids,
     segs => \@segs
@@ -82,7 +111,7 @@ sub exec_new_user_req {
 
 # deals with the msg for painting, returns the msg to be sent back
 sub exec_draw_req {
-  my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill) = @_;
+  my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill, $tttv) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "draw",
@@ -93,7 +122,8 @@ sub exec_draw_req {
     fg => $fg,
     bg => $bg,
     width => $width,
-    fill => $fill
+    fill => $fill,
+    tentative => $tttv
   });
   if ($shape eq "pen") {
     append_to_buffer($userid, $data);
@@ -109,7 +139,12 @@ sub exec_beginseg_req {
   # if just performed undo, do not push it in, merely replace it with a new line seg,
   # and we also need to rearrange the order of the canvases here.
   my ($userid, $undoed) = @_;
+  my @segs_to_base = ();
   if (!$undoed) { # not undo performed
+    @segs_to_base = parse_buffer($userid);
+    foreach my $datum (@segs_to_base) {
+      $datum =~ s/\"tentative\":1/\"tentative\":0/g;
+    }
     buffer2db($userid);
   }
   dump_buffer($userid);
@@ -117,7 +152,8 @@ sub exec_beginseg_req {
   my $data = $json->encode( {
     action => "begin_seg",
     userid => $userid,
-    undoed => $undoed
+    undoed => $undoed,
+    segs => \@segs_to_base
   });
   return $data;
 }
@@ -164,7 +200,8 @@ sub exec_msg {
         $data->{"fg"}, 
         $data->{"bg"}, 
         $data->{"width"}, 
-        $data->{"fill"}
+        $data->{"fill"},
+        $data->{"tentative"}
     );
   } elsif ($action eq "begin_seg") { # starting a new seg at mouseclick
     exec_beginseg_req(
@@ -187,13 +224,18 @@ websocket '/server' => sub {
   my $self = shift; # $self is the current client
 
   # connection established
-  my $client_id = $client_cnt;
-  my $clt = new Client($self, "shabi", $client_id);
+  my $client_id = 0;
+  while (defined($clients{$client_id})) { # use the smallest id available
+    $client_id++;
+  }
+  my $clt = new Client($self, "", $client_id);
   $clients{$client_id} = $clt;
   $client_cnt++;
 
   # connection closed
   $self->on_finish(sub {
+    buffer2db($client_id); # push the remaining data in the buffer to the database
+    dump_buffer($client_id); # clear the user's buffer
     delete $clients{$client_id};
   });
 
@@ -202,7 +244,9 @@ websocket '/server' => sub {
   $self->on_message(sub { # when receiving a message from the client
     my ($self, $message) = @_; # get the value of the client and the message
     my $msg_back = exec_msg($message, $client_id);
-    send_msg_to_all($msg_back);
+    if ($msg_back) {
+      send_msg_to_all($msg_back);
+    }
   });
 };
 

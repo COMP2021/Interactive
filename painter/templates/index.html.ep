@@ -26,7 +26,7 @@
       var currfg_g = [0, 0, 0]; // the current foreground color
       var currbg_g = [255, 255, 255]; // the current background color
       var currfill_g = 1; // whether to fill or not
-      var currwidth_g; // the current width of line
+      var currwidth_g = 1; // the current width of line
 
       if ( WebSocket.__initialize ) {
         WebSocket.__swfLocation = 'web-socket-js/WebSocketMain.swf';
@@ -47,6 +47,10 @@
           var data = jQuery.parseJSON(e.data);
           var action = data.action;
           if (action == "new_user") { // only for the first login
+            if (!data.permission) {
+              alert("username already in use");
+              login();
+            }
             init_detector();
             userid_g = data.userid; // assign an id to the user
             for (var i = 0; i < data.allid.length; i++) {
@@ -56,16 +60,20 @@
               draw_canvas(jQuery.parseJSON(data.segs[i]));
             }
           } else if (action == "new_canvas") { // add new canvas
-            add_canvas(data.userid);
+            if (data.userid != -1) {
+              add_canvas(data.userid);
+            }
           } else if (action == "draw" ) { // draw
             draw_canvas(data);
           } else if (action == "begin_seg") {
             move_canvas_to_top(data.userid);
+            for (var i = 0; i < data.segs.length; i++) {
+              draw_canvas(jQuery.parseJSON(data.segs[i]));
+            }
           }
         };
 
         ws.onclose = function() { // when socket is closed, do nothing now
-
         };
       }
 
@@ -88,7 +96,19 @@
 
       function draw_canvas(data) {
         if (data.shape == "pen") {
-          var cxt = $("#layer" + data.userid).get(0).getContext('2d');
+          var cxt;
+          if (data.tentative) { // draw the the layers above
+            if ($("#layer" + data.userid).get(0) !== undefined) {
+              cxt = $("#layer" + data.userid).get(0).getContext('2d');
+            }
+          } else { // draw on the base canvas
+            cxt = $("#canvas").get(0).getContext('2d');
+            // TODO clear the layer
+            if ($("#layer" + data.userid).get(0) !== undefined) {
+              $("#layer" + data.userid).get(0).getContext('2d')
+                  .clearRect(0, 0, 800, 600); // clear the canvas
+            }
+          }
           var color = "#" + data.fg[0].toString(16) + 
               data.fg[1].toString(16) + data.fg[2].toString(16);
           cxt.strokeStyle = color;
@@ -148,7 +168,8 @@
               fg: currfg_g,
               bg: currbg_g,
               width: currwidth_g,
-              fill: currfill_g
+              fill: currfill_g,
+              tentative: 1
             };
             ws.send(JSON.stringify(action));
             last_x = x_pos;
@@ -208,22 +229,6 @@
       $(document).ready(function() {
         login();
       });
-
-      // for debugging only
-      function send_req() {
-        var action = {
-          action: "draw",
-          userid: userid_g,
-          shape: "pen",
-          start: [100, 100],
-          end: [200, 200],
-          fg: [255, 0, 0],
-          bg: [0, 255, 0],
-          width: 3,
-          fill: 0
-        };
-        ws.send(JSON.stringify(action));
-      }
     </script>
     <style type="text/css">
       #top_bar {
