@@ -231,6 +231,9 @@
       });
     </script>
     <style type="text/css">
+      body {
+        background-color:#EEE;
+      }
       #top_bar {
         background-color:#333;
         padding-left:25px;
@@ -241,21 +244,51 @@
         color:#FFF;
         font-family:"Sans-serif";
       }
+      #title_bar {
+      }
       canvas {
         position:absolute;
-        left:0px;
-        top:0px;
+        left:30px;
+        top:50px;
+        border:1px solid #AAA;
+      }
+      #canvas {
+        background-color:#FFF;
+      }
+      #message_box {
+        position:absolute;
+        left:850px;
+        top:50px;
+        width:400px;
+        height:450px;
+        border:1px solid #AAA;
+        overflow:scroll;
+        overflow-x:hidden;
+        background-color:#FFF;
+      }
+      #talk_area {
+        position:absolute;
+        left:850px;
+        top:510px;
+        width:396px;
+        height:100px;
+        border:1px solid #AAA;
+        overflow:scroll;
+        overflow-x:hidden;
       }
     </style>
   </head>
   <body>
     <div id="top_bar"><p>&nbsp;</p></div>
-    <div id="title_bar">
-    </div>
+    <div id="title_bar"></div>
+    <div id="menu_bar"></div>
+    <div id="tool_bar"></div>
     <div id="canvas_container">
       <canvas id="canvas" width="800" height="600"></canvas>
       <canvas id="detector" width="800" height="600"></canvas>
     </div>
+    <div id="message_box"></div>
+    <textarea id="talk_area"></textarea>
     <div id="name_dialog">
       <p>Enter your name</p>
       <input id="name_input" type="text"/>
