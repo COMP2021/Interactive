@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 use Mojolicious::Lite;
 use Mojo::JSON;
