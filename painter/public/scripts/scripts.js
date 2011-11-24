@@ -1,3 +1,6 @@
+/**
+ * This file is for the websocket data transfer and drawing on canvases
+ */
 var ws; // global websocket
 
 var drawing = 0;
@@ -7,7 +10,12 @@ var canvas_inited = 0;
 var last_x = -1;
 var last_y = -1;
 
+var buf_x = 0;
+var buf_y = 0;
+
 var undo = 0;
+
+var timeout = true; // if true, then we can detect mouse moves, used to prevent too much data transfer
 
 // Following are the global variables describing the user's current state,
 // when changing the properties using the toolbar or others, just update
@@ -24,7 +32,13 @@ if ( WebSocket.__initialize ) {
   WebSocket.__swfLocation = 'web-socket-js/WebSocketMain.swf';
 }
 
+function time_out() {
+  timeout = true;
+}
+
 function init_socket() {
+  setInterval(time_out, 30); // allow mouse move detection every 30 milliseconds
+
   ws = new WebSocket('ws://143.89.218.59:3389/server');
 
   ws.onopen = function() {
@@ -87,39 +101,57 @@ function move_canvas_to_top(canvas_id) {
 }
 
 function draw_canvas(data) {
-  if (data.shape == "pen") {
-    var cxt;
-    if (data.tentative) { // draw the the layers above
-      if ($("#layer" + data.userid).get(0) !== undefined) {
-        cxt = $("#layer" + data.userid).get(0).getContext('2d');
-      }
-    } else { // draw on the base canvas
-      cxt = $("#canvas").get(0).getContext('2d');
-      // TODO clear the layer
-      if ($("#layer" + data.userid).get(0) !== undefined) {
-        $("#layer" + data.userid).get(0).getContext('2d')
-            .clearRect(0, 0, 800, 600); // clear the canvas
-      }
+  var cxt;
+  if (data.tentative) { // draw the the layers above
+    if ($("#layer" + data.userid).get(0) !== undefined) {
+      cxt = $("#layer" + data.userid).get(0).getContext('2d');
     }
-    var color = "#" + data.fg[0].toString(16) + 
-        data.fg[1].toString(16) + data.fg[2].toString(16);
-    cxt.strokeStyle = color;
-    cxt.lineWidth = data.width;
+  } else { // draw on the base canvas
+    cxt = $("#canvas").get(0).getContext('2d');
+    // TODO clear the layer
+    if ($("#layer" + data.userid).get(0) !== undefined) {
+      $("#layer" + data.userid).get(0).getContext('2d')
+          .clearRect(0, 0, 800, 600); // clear the canvas
+    }
+  }
+  var color = "#" + data.fg[0].toString(16) + 
+      data.fg[1].toString(16) + data.fg[2].toString(16);
+  cxt.strokeStyle = color;
+  cxt.lineWidth = data.width;
+  if (data.shape == "pen") {
     cxt.beginPath();
     cxt.moveTo(data.start[0], data.start[1]);
     cxt.lineTo(data.end[0], data.end[1]);
     cxt.stroke();
     cxt.closePath();
   } else if (data.shape == "line") {
+    $("#layer" + data.userid).get(0).getContext('2d')
+        .clearRect(0, 0, 800, 600); // clear the users canvas
+    cxt.beginPath();
+    cxt.moveTo(data.start[0], data.start[1]);
+    cxt.lineTo(data.end[0], data.end[1]);
+    cxt.stroke();
+    cxt.closePath();
   } else if (data.shape == "rect") {
   } else if (data.shape == "ellipse") {
   } else if (data.shape == "eraser") {
   }
+  if (data.username != username_g) {
+    $("#detector").get(0).getContext('2d')
+        .clearRect(buf_x - 40, buf_y - 40, 100, 80); // clear the detector canvas
+    cxt = $("#detector").get(0).getContext('2d');
+    cxt.fillStyle = "#FF0000";
+    cxt.fillText(data.username, data.end[0], data.end[1]);
+    buf_x = data.end[0];
+    buf_y = data.end[1];
+  }
+}
+
+function canvas_clear_username(e) {
 }
 
 function canvas_mousedown(e) {
-// TODO 
-  // Here we should send a message start_msg to notify the server the do the following:
+  // Here we send a message start_msg to notify the server the do the following:
   // 1. push the buffer into the database or delete the buffer (if just undoed)
   // 2. put the user's canvas at the top of all the canvases
   mousedown = 1;
@@ -133,8 +165,6 @@ function canvas_mousedown(e) {
 }
 
 function canvas_mouseup(e) {
-// TODO
-  // Here we should notify the server that the line seg has ended
   mousedown = 0;
   drawing = 0;
   last_x = -1;
@@ -142,31 +172,61 @@ function canvas_mouseup(e) {
 }
 
 function canvas_mousemove(e) {
-// TODO
   // Here we should send consecutive msgs to the server for updating
-  if (drawing) {
-    var x_pos = e.clientX - $("#canvas").prop("offsetLeft");
-    var y_pos = e.clientY - $("#canvas").prop("offsetTop");
-    if (last_x == -1 && last_y == -1) {
-      last_x = x_pos;
-      last_y = y_pos;
-    } else {
-      var action = {
-        action: "draw",
-        userid: userid_g,
-        shape: "pen",
-        start: [last_x, last_y],
-        end: [x_pos, y_pos],
-        fg: currfg_g,
-        bg: currbg_g,
-        width: currwidth_g,
-        fill: currfill_g,
-        tentative: 1
-      };
-      ws.send(JSON.stringify(action));
-      last_x = x_pos;
-      last_y = y_pos;
+  if (timeout) {
+    if (drawing) {
+      var x_pos = e.clientX - $("#canvas").prop("offsetLeft");
+      var y_pos = e.clientY - $("#canvas").prop("offsetTop");
+      switch (currtool_g) {
+        case "pen":
+          if (last_x == -1 && last_y == -1) {
+            last_x = x_pos;
+            last_y = y_pos;
+          } else {
+            var action = {
+              action: "draw",
+              userid: userid_g,
+              shape: "pen",
+              start: [last_x, last_y],
+              end: [x_pos, y_pos],
+              fg: currfg_g,
+              bg: currbg_g,
+              width: currwidth_g,
+              fill: currfill_g,
+              tentative: 1
+            };
+            ws.send(JSON.stringify(action));
+            last_x = x_pos;
+            last_y = y_pos;
+          }
+          break;
+        case "line":
+          if (last_x == -1 && last_y == -1) {
+            last_x = x_pos;
+            last_y = y_pos;
+          } else {
+            var action = {
+              action: "draw",
+              userid: userid_g,
+              shape: "line",
+              start: [last_x, last_y],
+              end: [x_pos, y_pos],
+              fg: currfg_g,
+              bg: currbg_g,
+              width: currwidth_g,
+              fill: currfill_g,
+              tentative: 1
+            };
+            ws.send(JSON.stringify(action));
+          }
+          break;
+        case "ellipse":
+          break;
+        case "eraser":
+          break;
+      }
     }
+    timeout = false;
   }
 }
 

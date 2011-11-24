@@ -111,11 +111,11 @@ sub exec_new_user_req {
 
 # deals with the msg for painting, returns the msg to be sent back
 sub exec_draw_req {
-  # tttv means "tentative" fuck you lunba... = =
   my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill, $tttv) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "draw",
+    username => $clients{$userid}->get_cname,
     userid => $userid,
     shape => $shape,
     start => $start,
@@ -162,6 +162,9 @@ sub exec_beginseg_req {
 sub exec_endseg_req {
 # TODO
   # Here we should end the seg
+}
+
+sub exec_chat_req {
 }
 
 # deals with the msg for undoing
