@@ -25,7 +25,7 @@ if ( WebSocket.__initialize ) {
 }
 
 function init_socket() {
-  ws = new WebSocket('ws://143.89.218.59:3389/server');
+  ws = new WebSocket('ws://127.0.0.1:8080/server');
 
   ws.onopen = function() {
     var action = { // new a user
