@@ -62,7 +62,7 @@ canvas and all the users can simultaneously see the updates of other painters.
 
 Thanks to the emerging of HTML5 canvas, which is a nice platform for
 developing various browser-based graphical applications, our project can start
-much easier than in the dark, old days when the similar functionalities have to be
+much easier than in the old days when the similar functionalities have to be
 implemented by Flash of SVG. The canvas mechanism provides a lot of handy APIs
 that can easily be adopted.
 
@@ -73,6 +73,11 @@ of the build-in web socket APIs is that they are now available for only a few
 web browsers, including Google Chrome, Chromium, and Safari, not even
 Mozilla Firefox (up till now), since the common agreement of HTML5 standard
 has not been reached yet.
+
+In addition, on the client side, we made use of the JQuery library, which 
+reduced the total lines of code and the amount of unnecessary work, since the 
+library provides us many shortcuts to implement the functionalities which 
+otherwise would take hundreds more lines of javascript code to implement.
 
 The server side is implemented using the Perl web framework of Mojolicious,
 which provide some useful APIs for web programming, including web socket.

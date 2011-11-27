@@ -37,7 +37,7 @@ function time_out() {
 }
 
 function init_socket() {
-  setInterval(time_out, 30); // allow mouse move detection every 30 milliseconds
+  setInterval(time_out, 20); // allow mouse move detection every 20 milliseconds
 
   ws = new WebSocket('ws://143.89.218.59:3389/server');
 
@@ -114,9 +114,12 @@ function draw_canvas(data) {
           .clearRect(0, 0, 800, 600); // clear the canvas
     }
   }
-  var color = "#" + data.fg[0].toString(16) + 
+  var fgcolor = "#" + data.fg[0].toString(16) + 
       data.fg[1].toString(16) + data.fg[2].toString(16);
-  cxt.strokeStyle = color;
+  var bgcolor = "#" + data.bg[0].toString(16) + 
+      data.bg[1].toString(16) + data.bg[2].toString(16);
+  cxt.strokeStyle = fgcolor;
+  cxt.fillStyle = bgcolor;
   cxt.lineWidth = data.width;
   if (data.shape == "pen") {
     cxt.beginPath();
@@ -125,13 +128,22 @@ function draw_canvas(data) {
     cxt.stroke();
     cxt.closePath();
   } else if (data.shape == "line") {
-    $("#layer" + data.userid).get(0).getContext('2d')
-        .clearRect(0, 0, 800, 600); // clear the users canvas
+    if ($("#layer" + data.userid).get(0) !== undefined) {
+      $("#layer" + data.userid).get(0).getContext('2d')
+          .clearRect(0, 0, 800, 600); // clear the users canvas
+    }
     cxt.beginPath();
     cxt.moveTo(data.start[0], data.start[1]);
     cxt.lineTo(data.end[0], data.end[1]);
     cxt.stroke();
     cxt.closePath();
+  } else if (data.shape == "rect") {
+    if ($("#layer" + data.userid).get(0) !== undefined) {
+      $("#layer" + data.userid).get(0).getContext('2d')
+          .clearRect(0, 0, 800, 600); // clear the users canvas
+    }
+    cxt.fillRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
+    cxt.strokeRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
   } else if (data.shape == "rect") {
   } else if (data.shape == "ellipse") {
   } else if (data.shape == "eraser") {
@@ -220,6 +232,26 @@ function canvas_mousemove(e) {
             ws.send(JSON.stringify(action));
           }
           break;
+        case "rect":
+          if (last_x == -1 && last_y == -1) {
+            last_x = x_pos;
+            last_y = y_pos;
+          } else {
+            var action = {
+              action: "draw",
+              userid: userid_g,
+              shape: "rect",
+              start: [last_x, last_y],
+              end: [x_pos, y_pos],
+              fg: currfg_g,
+              bg: currbg_g,
+              width: currwidth_g,
+              fill: currfill_g,
+              tentative: 1
+            };
+            ws.send(JSON.stringify(action));
+          }
+          break;
         case "ellipse":
           break;
         case "eraser":
@@ -278,6 +310,15 @@ function login() {
   show_dialog();
 }
 
+function set_tool(tool) {
+  currtool_g = tool;
+}
+
+function make_url() {
+  var url = $("#canvas").get(0).toDataURL();
+}
+
 $(document).ready(function() {
   login();
+  init_ui();
 });

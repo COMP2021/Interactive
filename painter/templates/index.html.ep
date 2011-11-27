@@ -5,6 +5,7 @@
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script src="/scripts/ui.js"></script>
     <script src="/scripts/scripts.js"></script>
     <style type="text/css">
       body {
@@ -21,11 +22,40 @@
         font-family:"Sans-serif";
       }
       #title_bar {
+        background-color:#FFF;
+        padding-left:25px;
+        padding-top:5px;
+        margin:-22px;
+        border:1px solid #AAA;
+      }
+      #title_text {
+        margin-top:20px;
+      }
+      #inter_cav {
+        font-size:30px;
+        color:#333;
+        font-family:"Sans-serif";
+      }
+      #power {
+        font-size:16px;
+        color:#999;
+        font-family:"Sans-serif";
+        padding-left:30px;
+      }
+      #copy {
+        font-size:14px;
+        color:#666;
+        font-family:"Sans-serif";
+        float:right;
+        margin-right:60px;
+        padding:10px;
+        border:1px solid #AAA;
+        border-radius:4px;
       }
       canvas {
         position:absolute;
         left:30px;
-        top:50px;
+        top:180px;
         border:1px solid #AAA;
       }
       #canvas {
@@ -34,7 +64,7 @@
       #message_box {
         position:absolute;
         left:850px;
-        top:50px;
+        top:180px;
         width:400px;
         height:450px;
         border:1px solid #AAA;
@@ -45,20 +75,60 @@
       #talk_area {
         position:absolute;
         left:850px;
-        top:510px;
+        top:640px;
         width:396px;
         height:100px;
         border:1px solid #AAA;
         overflow:scroll;
         overflow-x:hidden;
       }
+      .inline {
+        display:inline;
+      }
+      #tools {
+        position:absolute;
+        left:40px;
+        top:124px;
+      }
+      #tools li {
+        float:left;
+        padding-left:10px;
+        padding-right:10px;
+      }
+      .tool_icon {
+        width:24px;
+        height:24px;
+      }
     </style>
   </head>
   <body>
-    <div id="top_bar"><p>&nbsp;</p></div>
-    <div id="title_bar"></div>
-    <div id="menu_bar"></div>
+    <div id="top_bar">
+      <p>&nbsp;</p>
+    </div>
+    <div id="title_bar">
+      <div id="title_text">
+        <p id="inter_cav" class="inline">Interactive Canvas</p>
+        <p id="power" class="inline">Trial Run</p>
+        <div id="copy_div" class="inline">
+          <p id="copy">Make a copy</p>
+        </div>
+      </div>
+      <p>&nbsp;</p>
+    </div>
     <div id="tool_bar"></div>
+      <ul id="tools">
+        <li id="tool_pen">Pen</li>
+        <li id="tool_line">Line</li>
+        <li id="tool_rect">Rect</li>
+        <li id="tool_ellipse">Ellipse</li>
+        <li id="tool_eraser">Eraser</li>
+        <li id="tool_undo">Undo</li>
+        <li id="tool_redo">Redo</li>
+        <li id="tool_fg">Foreground</li>
+        <li id="tool_bg">Background</li>
+        <li id="tool_width">Width</li>
+        <li id="tool_fill">Fill</li>
+      </ul>
     <div id="canvas_container">
       <canvas id="canvas" width="800" height="600"></canvas>
       <canvas id="detector" width="800" height="600"></canvas>

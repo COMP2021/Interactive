@@ -239,6 +239,8 @@ websocket '/server' => sub {
   # connection closed
   $self->on_finish(sub {
     buffer2db($client_id); # push the remaining data in the buffer to the database
+    print get_buffer($client_id);
+    print "\n";
     dump_buffer($client_id); # clear the user's buffer
     delete $clients{$client_id};
   });
