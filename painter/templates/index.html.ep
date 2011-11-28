@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Test</title>
+    <title>Interactive Canvas</title>
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
@@ -13,13 +13,14 @@
       }
       #top_bar {
         background-color:#333;
+        height:48px;
         padding-left:25px;
         margin:-22px;
       }
       #top_bar p {
         font-size:22px;
         color:#FFF;
-        font-family:"Sans-serif";
+        font-family:"Arial";
       }
       #title_bar {
         background-color:#FFF;
@@ -34,7 +35,7 @@
       #inter_cav {
         font-size:30px;
         color:#333;
-        font-family:"Sans-serif";
+        font-family:"Arial";
       }
       #power {
         font-size:16px;
@@ -51,6 +52,12 @@
         padding:10px;
         border:1px solid #AAA;
         border-radius:4px;
+      }
+      #comment {
+        font-size:16px;
+        color:#999;
+        padding-left:30px;
+        margin-bottom:30px;
       }
       canvas {
         position:absolute;
@@ -82,13 +89,18 @@
         overflow:scroll;
         overflow-x:hidden;
       }
+      #send_button {
+        position:absolute;
+        left:850px;
+        top:750px;
+      }
       .inline {
         display:inline;
       }
       #tools {
         position:absolute;
         left:40px;
-        top:124px;
+        top:140px;
       }
       #tools li {
         float:left;
@@ -108,14 +120,14 @@
     <div id="title_bar">
       <div id="title_text">
         <p id="inter_cav" class="inline">Interactive Canvas</p>
-        <p id="power" class="inline">Trial Run</p>
+        <p id="power" class="inline">Powered by Mojolicious</p>
         <div id="copy_div" class="inline">
           <p id="copy">Make a copy</p>
         </div>
+        <p id="comment">A demo of the exciting features of HMTL5 canvas and WebSocket.</p>
       </div>
-      <p>&nbsp;</p>
     </div>
-    <div id="tool_bar"></div>
+    <div id="tool_bar">
       <ul id="tools">
         <li id="tool_pen">Pen</li>
         <li id="tool_line">Line</li>
@@ -129,6 +141,7 @@
         <li id="tool_width">Width</li>
         <li id="tool_fill">Fill</li>
       </ul>
+    </div>
     <div id="canvas_container">
       <canvas id="canvas" width="800" height="600"></canvas>
       <canvas id="detector" width="800" height="600"></canvas>

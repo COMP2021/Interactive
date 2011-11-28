@@ -187,8 +187,8 @@ function canvas_mousemove(e) {
   // Here we should send consecutive msgs to the server for updating
   if (timeout) {
     if (drawing) {
-      var x_pos = e.clientX - $("#canvas").prop("offsetLeft");
-      var y_pos = e.clientY - $("#canvas").prop("offsetTop");
+      var x_pos = e.layerX;
+      var y_pos = e.layerY;
       switch (currtool_g) {
         case "pen":
           if (last_x == -1 && last_y == -1) {

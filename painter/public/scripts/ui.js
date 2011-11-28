@@ -93,6 +93,7 @@ function init_tools() {
 
 function init_ui() {
   init_tools();
+  $("#send_button").button();
   $("#copy_div").hover(copy_over, copy_out);
   $("#copy_div").mousedown(copy_clicked);
 }
