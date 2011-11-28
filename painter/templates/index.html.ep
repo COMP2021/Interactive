@@ -122,9 +122,9 @@
         <p id="inter_cav" class="inline">Interactive Canvas</p>
         <p id="power" class="inline">Powered by Mojolicious</p>
         <div id="copy_div" class="inline">
-          <p id="copy">Make a copy</p>
+          <p id="copy">Save As</p>
         </div>
-        <p id="comment">A demo of the exciting features of HMTL5 canvas and WebSocket.</p>
+        <p id="comment">A demo of the exciting features of HTML5 canvas and WebSocket.</p>
       </div>
     </div>
     <div id="tool_bar">
