@@ -90,6 +90,7 @@ function fgColor_out(){
 }
 
 function fgColor_clicked(){
+  //TODO: update the fgColor.
   $("#fg_name").show().miniColors({
     change: function(hex, rgb){
               //TODO
