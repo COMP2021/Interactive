@@ -11,22 +11,36 @@
       body {
         background-color:#EEE;
       }
+      #container {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:100%;
+      }
       #top_bar {
         background-color:#333;
-        height:48px;
-        padding-left:25px;
-        margin:-22px;
+        margin-top:-22px;
       }
-      #top_bar p {
+      #username {
+        padding-left:15px;
         font-size:22px;
         color:#FFF;
         font-family:"Arial";
       }
+      #setting {
+        float:right;
+        margin-top:-48px;
+        margin-right:2px;
+        padding:5px 7px 0px 7px;
+      }
+      #setting_img {
+        width:16px;
+        height:16px;
+      }
       #title_bar {
         background-color:#FFF;
-        padding-left:25px;
-        padding-top:5px;
-        margin:-22px;
+        padding-left:15px;
+        margin-top:-22px;
         border:1px solid #AAA;
       }
       #title_text {
@@ -43,12 +57,22 @@
         font-family:"Sans-serif";
         padding-left:30px;
       }
-      #copy {
+      #saveas {
         font-size:14px;
         color:#666;
         font-family:"Sans-serif";
         float:right;
         margin-right:60px;
+        padding:10px;
+        border:1px solid #AAA;
+        border-radius:4px;
+      }
+      #upload {
+        font-size:14px;
+        color:#666;
+        font-family:"Sans-serif";
+        float:right;
+        margin-right:20px;
         padding:10px;
         border:1px solid #AAA;
         border-radius:4px;
@@ -100,7 +124,7 @@
       #tools {
         position:absolute;
         left:40px;
-        top:140px;
+        top:136px;
       }
       #tools li {
         float:left;
@@ -111,46 +135,63 @@
         width:24px;
         height:24px;
       }
+      #setting_menu {
+        position:absolute;
+        border:1px solid #CCC;
+        padding:5px 20px 5px 20px;
+        background:#FFF;
+      }
+      #setting_menu p {
+        font-family:"Arial";
+        color:#999;
+      }
     </style>
   </head>
   <body>
-    <div id="top_bar">
-      <p>&nbsp;</p>
-    </div>
-    <div id="title_bar">
-      <div id="title_text">
-        <p id="inter_cav" class="inline">Interactive Canvas</p>
-        <p id="power" class="inline">Powered by Mojolicious</p>
-        <div id="copy_div" class="inline">
-          <p id="copy">Make a copy</p>
+    <div id="container">
+      <div id="top_bar">
+        <p id="username">Please Login</p>
+        <div id="setting">
+          <img id="setting_img" src="/images/setting.png"/>
         </div>
-        <p id="comment">A demo of the exciting features of HMTL5 canvas and WebSocket.</p>
       </div>
-    </div>
-    <div id="tool_bar">
-      <ul id="tools">
-        <li id="tool_pen">Pen</li>
-        <li id="tool_line">Line</li>
-        <li id="tool_rect">Rect</li>
-        <li id="tool_ellipse">Ellipse</li>
-        <li id="tool_eraser">Eraser</li>
-        <li id="tool_undo">Undo</li>
-        <li id="tool_redo">Redo</li>
-        <li id="tool_fg">Foreground</li>
-        <li id="tool_bg">Background</li>
-        <li id="tool_width">Width</li>
-        <li id="tool_fill">Fill</li>
-      </ul>
-    </div>
-    <div id="canvas_container">
-      <canvas id="canvas" width="800" height="600"></canvas>
-      <canvas id="detector" width="800" height="600"></canvas>
-    </div>
-    <div id="message_box"></div>
-    <textarea id="talk_area"></textarea>
-    <div id="name_dialog">
-      <p>Enter your name</p>
-      <input id="name_input" type="text"/>
+      <div id="title_bar">
+        <div id="title_text">
+          <p id="inter_cav" class="inline">Interactive Canvas</p>
+          <p id="power" class="inline">Powered by Mojolicious</p>
+          <div id="saveas_div" class="inline"><p id="saveas">Save As</p></div>
+          <div id="upload_div" class="inline"><p id="upload">Upload</p></div>
+          <p id="comment">A demo of the exciting features of HTML5 canvas and WebSocket.</p>
+        </div>
+      </div>
+      <div id="tool_bar">
+        <ul id="tools">
+          <li id="tool_pen">Pen</li>
+          <li id="tool_line">Line</li>
+          <li id="tool_rect">Rect</li>
+          <li id="tool_ellipse">Ellipse</li>
+          <li id="tool_eraser">Eraser</li>
+          <li id="tool_undo">Undo</li>
+          <li id="tool_redo">Redo</li>
+          <li id="tool_fg">Foreground</li>
+          <li id="tool_bg">Background</li>
+          <li id="tool_width">Width</li>
+          <li id="tool_fill">Fill</li>
+        </ul>
+      </div>
+      <div id="canvas_container">
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <canvas id="detector" width="800" height="600"></canvas>
+      </div>
+      <div id="message_box"></div>
+      <textarea id="talk_area"></textarea>
+      <div id="name_dialog">
+        <p>Enter your name</p>
+        <input id="name_input" type="text"/>
+      </div>
+      <div id="setting_menu">
+        <p id="logout" class="inline">Logout</p>
+      </div>
     </div>
   </body>
 </html>

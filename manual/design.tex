@@ -1,28 +1,28 @@
-\documentclass[a4paper,11pt,twocolumn]{article}
+\documentclass[a4paper,11pt,3p]{article}
 \usepackage{parskip}
-\usepackage{amsthm}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\topmargin -1.5cm
-\oddsidemargin -0.04cm
-\evensidemargin -0.04cm
-\textwidth 16.59cm
-\textheight 25cm
+\pagestyle{headings}
 
 \title{
-  Design and Implementation of an Interactive Painter\\
+  \textbf{Interactive Canvas}\\
+  A demo of the exciting features of HTML5\\
+  canvas and WebSocket
 }
 
 \author{
-  GUO Yuxiang, WU Sisi, ZHANG Yaofeng, ZHANG Yusi, ZHAO Guanlun
+  GUO Yuxiang\\
+  WU Sisi\\
+  ZHANG Yaofeng\\
+  ZHANG Yusi\\
+  ZHAO Guanlun
 }
+
+\date{}
 
 \begin{document}
 
 \maketitle
 
 \abstract{}
-
 The Interactive Painter is an online application that allows multiple users to
 interactively paint on one canvas and communicate with each other at the same
 time. Based on the web socket mechanism, this application works quite
@@ -32,67 +32,190 @@ which is a convenient platform for collaborations. Since a graphical version
 is not available, we started this project to design and implement this
 painter.
 
+\section{Motivation}
+\emph{The motivation of this project is that there lacks a user-friendly
+online cooperation drawing platform.}\\
+
+A online interactive canvas can make it much easier for people having online 
+meetings or discussion by allowing the users to draw on a piece of canvas and 
+convey their ideas more effectively and comfortably.\\
+
+However, now we don't have a relatively well-developed application available like 
+this. If someone, for example, a designer, wishes to describe his or her design to 
+someone else online, he or she will most probably choose to send emails and this is 
+clearly not as convenient as having an interactive platform to draw on while keep 
+others updated simultaneously.\\
+
+What's more, if some organization needs to have an online meeting in which the members 
+are to discuss a plan, a interactive picture can usually provide a much more straightforward
+medium for the exchange of opinions.\\
+
+Thus we thought of implementing an interactive canvas to make life easier. Hopefully 
+we will continue with this project and develop it into a full-functional web application 
+with more friendly user interface as well as more advanced features.\\
+
 \section{Basic Idea}
+\emph{Here we briefly explains how the application works from the perspective of a
+user.}\\
 
-Here we briefly explains how the application works in the perspective of a
-user.
+When the user enters the webpage of the our interactive canvas, he or she will 
+firstly be promoted to enter a username. After that the main interface is entered 
+and the user can now start to draw on the canvas or chat with other users.\\
 
-When the user enters the website, he/she will be prompted either to join an
-existing workspace or create a new one. If the user choose to create a new
-workspace, an instance of a workspace will be created in the server side,
-otherwise all the existing data will be passed to the client side browser and
-the existing canvas will be constructed according to the data from the server
-side (This part will be covered shortly).
+When the user draws on the canvas or send messages through the chatting module, a 
+message, stringified with JSON, with be sent to the server and the server, according 
+to different circumstances, will use the database and send another message back to 
+the user or all the users. Then the view of the webpage is changed. This is basically 
+one single step of the data communication.\\
 
-When the user has entered the workspace, he/she can do the following: to draw
-on the canvas, to chat with other painters through messages, to save and
-download the work, or many others. These different activities will be
-converted into a string that contains the relevant message and passed to the
-server through the same interface.
+More complicated data communication will be covered in the following sections.\\
 
-The server receives the data from the clients, parse the string and deal with
-the different requests by calling different methods. The methods accept a
-string and update the server-side data and then return a new string which will
-be sent back to the clients.
+When the user logs out, the user will be deleted from the server but the data will be 
+kept in the server's database.\\
 
-After receiving the data the server sends back, the web browser draws on the
-canvas and all the users can simultaneously see the updates of other painters.
+\section{Design}
 
-\section{Framework}
+\emph{The design of this application is mainly about the client side canvas mechanism and 
+server-side database, also including the data transfer and user interface.}\\
 
-Thanks to the emerging of HTML5 canvas, which is a nice platform for
+\begin{itemize}
+\item
+\emph{Canvas Mechanism}: The structure of the canvases is quite complicated in this application. 
+The main reason for this is the implementation of undo and redo functionalities. This will be 
+covered later in the "highlighted features" section. Here we mainly introduce the use of the 
+canvas to display the line segments: When the client side \textbf{onmessage()} function is triggered by a 
+message containing a drawing request from the server, the function \textbf{draw\_canvas()} is called, 
+drawing on the canvas according to what is specified in the message. This works for both the user 
+who had drawn this line segment and other users. The canvas also works in catching the 
+\textbf{mouseevent}s generated by the user's mouseclick, mousemove and so on. When a valid mouseevent 
+is caught a message is send to the server. Thus the canvas is the central part of the client side 
+implementation.\\
+
+\item
+\emph{Database}: The database mainly consists of two parts: one for the line segments and the other 
+for chatting history. The database for chatting history is quite simple, which is no more than a 
+normal array. The database for line segments are more complex, which consists of a static database 
+and some buffers, whose number is equal to the number of current users. The database only store the 
+segments that are not to be changed and buffers are for the segments that can be "undoed" and "redoed".\\
+
+\item
+\emph{Data Transfer}: The data transfer part is supported by $JSON$, the data-interchange format. 
+The types of data transfers in this application is quite varied, which can be categorized into the 
+following parts: user login, user logout, drawing segments, starting and ending segments, undo, redo, 
+chatting and so on. All the requests have different labels that make them easily recognizable by the 
+server and the client-side programs.\\
+
+\item
+\emph{User Interface}: The user interface design of the interactive painter is inspired by the 
+UI of Google Docs, which uses a quite refreshing theme with simple lines and only a few kinds of 
+color. We chose it because our application is aimed to be simple and elegant, and this style is 
+quite suitable.\\
+
+\end{itemize}
+
+\section{Highlighted Features}
+\emph{Our application also includes some highlighted features that make it more user-friendly and 
+more elegant}.\\
+
+\subsection{Multiple Canvas Mechanism}
+\emph{The most interesting and complicated part of this application is the implementation of the multiple canvas 
+mechanism and it is adapted for several reasons.}
+
+Firstly, it would be very inconvenient if a painter does not have undo and redo functions. 
+The implementation of these functions is so trivial on local, non-interactive canvas applications, 
+that what needs to be done is merely saving the current canvas each time the mouse is pressed 
+down and save them in a stack. However in an interactive application this approach is not as 
+practical. The reason is that if every time undo is pressed we need to send all the data of 
+all the pixels to each and every client, it would be too much to transfer. Another very important 
+reason is that even if the network capacity is extremely large, we cannot do this because we cannot 
+handle the situation that multiple users and drawing simultaneously on the same canvas but each user 
+can only undo his or her own line segments. Therefore if one user need to have the canvas saved in the 
+stack while others are still drawing, it obviously causes a problem that when undo is performed we cannot 
+simply restore the previous canvas.\\
+
+The second reason is that when a new user enters the application, all the previous line segments need to 
+be sent to him or her in order to initialize the canvas. Then it also causes some difficulties 
+when dealing with data synchronization if other users are still drawing.\\
+
+Therefore we implemented the multiple layer mechanism, which can be divided into three parts:\\
+\begin{itemize}
+\item
+\emph{Base Canvas}: The canvas in the lowermost position, where all the static segments are drawn. 
+Since now we only support single-step undo and redo (multiple-step undo and redo is extremely 
+difficult if we don't have good enough network speed to transfer the entire canvas for each undo and 
+redo), we need to store the segments that are not going to be removed.\\
+\item
+\emph{User's Layers}: Each user has its own layer
+\item
+\emph{Detector Canvas}:
+\end{itemize}
+
+\subsection{Upload and Download}
+
+\section{Web Frameworks}
+\emph{In this section we will introduce the framework we used for development, 
+including Mojolicious, the Perl framework, HTML5 and jQuery.}\\
+
+\begin{itemize}
+\item
+\emph{Mojolicious}: The server side is implemented using the Perl web framework of Mojolicious,
+which provides some useful APIs for web programming, including WebSocket.
+Mojolicious works quite efficiently when large amount of data need to be
+transfered. Since our application is really data-dense, a efficient WebSocket 
+framework is needed and fortunately Mojolicious provides it.\\
+
+\item
+\emph{HTML5 Canvas}: Thanks to the emerging of HTML5 canvas, which is a nice platform for
 developing various browser-based graphical applications, our project can start
 much easier than in the old days when the similar functionalities have to be
 implemented by Flash of SVG. The canvas mechanism provides a lot of handy APIs
-that can easily be adopted.
+that can easily be adopted.\\
 
-The new HTML5 also provides built-in support for web socket, which is an
+\item
+\emph{HTML5 Websocket}: The new HTML5 also provides built-in support for WebSocket, an
 efficient and user-friendly communication tool for data transfer. Now the web
 socket is directly accessible from Javascript. However, one important drawback
 of the build-in web socket APIs is that they are now available for only a few
 web browsers, including Google Chrome, Chromium, and Safari, not even
 Mozilla Firefox (up till now), since the common agreement of HTML5 standard
-has not been reached yet.
+has not been reached yet.\\
 
-In addition, on the client side, we made use of the JQuery library, which 
-reduced the total lines of code and the amount of unnecessary work, since the 
-library provides us many shortcuts to implement the functionalities which 
-otherwise would take hundreds more lines of javascript code to implement.
+\item
+\emph{jQuery}: On the client side, we made use of the jQuery framework, which 
+reduced the total lines of code and the amount of unnecessary work with it great simplicity, 
+since the library provides us many shortcuts to implement the functionalities which 
+otherwise would take hundreds more lines of javascript code to implement.\\
 
-The server side is implemented using the Perl web framework of Mojolicious,
-which provide some useful APIs for web programming, including web socket.
-Mojolicious works quite efficiently when large amount of data need to be
-transfered.
+\item
+\emph{JSON}: In order to make to data transfer easier to deal with, we also made use of JSON, 
+a simple tool to stringify data and what we need is just to make use of the API 
+built-in in both Javascript and Mojolicious.\\
+\end{itemize}
 
-\section{Design}
+\section{Knowledge Used from COMP2021}
+\emph{We used several important points that are covered in COMP2021 in doing this project}\\
 
-Coming back to the client side, we have to draw the lines and shapes on the
-canvas. Since we need to deal with a lot of different situations (covered
-later), we apply a special structure to this application. All the users share
-a common canvas that contains the "static" part of the canvas, and at the same
-time each user has a transparent layer, which is also a canvas, to draw
-his/her most recent 
+\begin{itemize}
+\item
+\emph{Unix}: We worked on this project entirely on Linux. What we did includes setting up the 
+server, using \textbf{vim} to edit the programs, using \textbf{git} as the tool for version 
+control and so on.\\
 
+\item
+\emph{Perl Programming}: The entire sever-side program is written in Perl, through which we 
+obtained a deeper understanding not only about the Perl programming language, but about the 
+script languages as well.\\
 
+\item
+\emph{HTML and Client-Side Programs}: The most exciting part of this application is done by 
+HTML5 and the client-side programs.\\
+
+\item
+\emph{CGI Programming}: This application, although not using the CGI model provided by the 
+lecture notes, made use of the CGI-like framework and WebSocket. Huge amount of data transfer between the 
+server side and the client side is done. Without the course materials we would have found it 
+much more difficult to understand the mechanism.\\
+
+\end{itemize}
 
 \end{document}

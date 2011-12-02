@@ -1,15 +1,44 @@
-function copy_over() {
-  $("#copy").css("color", "#333");
-  $("#copy").css("border-color", "#333");
+var setting_clked = false;
+
+function setting_over() {
+  if (!setting_clked) {
+    $("#setting").css("background", "#666");
+  }
 }
 
-function copy_clicked() {
+function setting_out() {
+  if (!setting_clked) {
+    $("#setting").css("background", "#333");
+    $("#setting_img").attr("src", "/images/setting.png");
+  }
+}
+
+function setting_clicked() {
+  if (setting_clked) {
+    setting_clked = false;
+  } else {
+    setting_clked = true;
+  }
+  $("#setting_img").attr("src", "/images/setting_clicked.png");
+  $("#setting").css("background", "#FFF");
+  var left = $("#setting").position().left;
+  $("#setting_menu").css("top", 24);
+  $("#setting_menu").css("left", left - 60);
+  $("#setting_menu").show();
+}
+
+function saveas_over() {
+  $("#saveas").css("color", "#333");
+  $("#saveas").css("border-color", "#333");
+}
+
+function saveas_clicked() {
   make_url();
 }
 
-function copy_out() {
-  $("#copy").css("color", "#666");
-  $("#copy").css("border-color", "#AAA");
+function saveas_out() {
+  $("#saveas").css("color", "#666");
+  $("#saveas").css("border-color", "#AAA");
 }
 
 function pen_over() {
@@ -92,8 +121,15 @@ function init_tools() {
 }
 
 function init_ui() {
+  $("#setting_menu").hide();
+  $("#setting_menu").mouseover(setting_clicked);
+
   init_tools();
+  $("#setting").hover(setting_over, setting_out);
+  $("#setting").mousedown(setting_clicked);
+
   $("#send_button").button();
-  $("#copy_div").hover(copy_over, copy_out);
-  $("#copy_div").mousedown(copy_clicked);
+
+  $("#saveas_div").hover(saveas_over, saveas_out);
+  $("#saveas_div").mousedown(saveas_clicked);
 }

@@ -22,11 +22,6 @@ get '/index' => sub {
 sub on_connect {
 }
 
-# initialize the canvas
-sub on_enter_wksp {
-  # add a canvas to each client's page
-}
-
 # when the user leaves
 sub on_finish {
 }
@@ -135,13 +130,9 @@ sub exec_draw_req {
 }
 
 sub exec_beginseg_req {
-# TODO
-  # Here we should also put the data in the client's buffer into the shared database, 
-  # if just performed undo, do not push it in, merely replace it with a new line seg,
-  # and we also need to rearrange the order of the canvases here.
   my ($userid, $undoed) = @_;
   my @segs_to_base = ();
-  if (!$undoed) { # not undo performed
+  if (!$undoed) { # no undo performed
     @segs_to_base = parse_buffer($userid);
     foreach my $datum (@segs_to_base) {
       $datum =~ s/\"tentative\":1/\"tentative\":0/g;
@@ -159,28 +150,44 @@ sub exec_beginseg_req {
   return $data;
 }
 
-sub exec_endseg_req {
-# TODO
-  # Here we should end the seg
-}
-
 sub exec_chat_req {
 }
 
 # deals with the msg for undoing
 sub exec_undo_req {
-  my @items = @_;
-# TODO
-  # send the clients a msg to clear the canvas but keep the buffer unchanged
-  # also set a flag to indicate that we performed undo
+  my $userid = $_[0];
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "undo",
+    userid => $userid
+  });
+  return $data;
 }
 
 # deals with the msg for redoing
 sub exec_redo_req {
-  my @items = @_;
-# TODO
-  # send the clients a msg to restore the canvas we cleared
-  # also trun off the flag to indicate that we have not ust performed undo
+  my $userid = $_[0];
+  my $json = Mojo::JSON->new;
+  my @segs = parse_buffer($userid);
+  my $data = $json->encode( {
+    action => "redo",
+    userid => $userid,
+    segs => \@segs
+  });
+  return $data;
+}
+
+# dealw with chatting
+sub exec_chat_req {
+  my ($username, $time, $content) = @_;
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "chat",
+    username => $username,
+    time => $time,
+    content => $content
+  });
+  return $data;
 }
 
 # accepts a message as arg and call different methods according to the type,
@@ -212,6 +219,20 @@ sub exec_msg {
         $data->{"userid"},
         $data->{"undoed"}
     );
+  } elsif ($action eq "undo") { # undo
+    exec_undo_req(
+        $data->{"userid"}
+    );
+  } elsif ($action eq "redo") { # redo
+    exec_redo_req(
+        $data->{"userid"}
+    );
+  } elsif ($action eq "chat") { # chat
+    exec_chat_req(
+        $data->{"username"},
+        $data->{"time"},
+        $data->{"content"}
+    );
   }
 }
 
@@ -239,8 +260,6 @@ websocket '/server' => sub {
   # connection closed
   $self->on_finish(sub {
     buffer2db($client_id); # push the remaining data in the buffer to the database
-    print get_buffer($client_id);
-    print "\n";
     dump_buffer($client_id); # clear the user's buffer
     delete $clients{$client_id};
   });

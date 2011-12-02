@@ -8,6 +8,9 @@ our %buffers = ();
 # database used to store the line drawn
 our @seg_db = ();
 
+# database used to store the chats
+our @chat_db = ();
+
 # set the user's buffer to the newest line seg
 sub set_buffer {
   my ($user_id, $data) = @_;
@@ -54,6 +57,17 @@ sub get_buffer {
 # return all the buffers
 sub get_all_buffers {
   return %buffers;
+}
+
+# insert to the chat_db
+sub insert_chatdb {
+  my $chat = $_[0];
+  push(@chat_db, $chat);
+}
+
+# get the chat db
+sub get_chatdb {
+  return @chat_db;
 }
 
 # print the info of the database, for debugging

@@ -13,7 +13,7 @@ var last_y = -1;
 var buf_x = 0;
 var buf_y = 0;
 
-var undo = 0;
+var undoed = 0;
 
 var timeout = true; // if true, then we can detect mouse moves, used to prevent too much data transfer
 
@@ -52,30 +52,46 @@ function init_socket() {
   ws.onmessage = function(e) { // when the client receives a message
     var data = jQuery.parseJSON(e.data);
     var action = data.action;
-    if (action == "new_user") { // only for the first login
-      if (!data.permission) {
-        alert("username already in use");
-        login();
-      }
-      init_detector();
-      userid_g = data.userid; // assign an id to the user
-      for (var i = 0; i < data.allid.length; i++) {
-        add_canvas(data.allid[i]); // add the existing canvases
-      }
-      for (var i = 0; i < data.segs.length; i++) {
-        draw_canvas(jQuery.parseJSON(data.segs[i]));
-      }
-    } else if (action == "new_canvas") { // add new canvas
-      if (data.userid != -1) {
-        add_canvas(data.userid);
-      }
-    } else if (action == "draw" ) { // draw
-      draw_canvas(data);
-    } else if (action == "begin_seg") {
-      move_canvas_to_top(data.userid);
-      for (var i = 0; i < data.segs.length; i++) {
-        draw_canvas(jQuery.parseJSON(data.segs[i]));
-      }
+
+    switch (action) {
+      case "new_user":
+        if (!data.permission) {
+          alert("username already in use");
+          login();
+        }
+        init_detector();
+        userid_g = data.userid; // assign an id to the user
+        for (var i = 0; i < data.allid.length; i++) {
+          add_canvas(data.allid[i]); // add the existing canvases
+        }
+        for (var i = 0; i < data.segs.length; i++) {
+          draw_canvas(jQuery.parseJSON(data.segs[i]));
+        }
+        break;
+      case "new_canvas":
+        if (data.userid != -1) {
+          add_canvas(data.userid);
+        }
+        break;
+      case "draw":
+        draw_canvas(data);
+        break;
+      case "begin_seg":
+        move_canvas_to_top(data.userid);
+        for (var i = 0; i < data.segs.length; i++) {
+          draw_canvas(jQuery.parseJSON(data.segs[i]));
+        }
+        break;
+      case "undo":
+        $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, 800, 600);
+        break;
+      case "redo":
+        for (var i = 0; i < data.segs.length; i++) {
+          draw_canvas(jQuery.parseJSON(data.segs[i]));
+        }
+        break;
+      case "chat":
+        break;
     }
   };
 
@@ -121,32 +137,37 @@ function draw_canvas(data) {
   cxt.strokeStyle = fgcolor;
   cxt.fillStyle = bgcolor;
   cxt.lineWidth = data.width;
-  if (data.shape == "pen") {
-    cxt.beginPath();
-    cxt.moveTo(data.start[0], data.start[1]);
-    cxt.lineTo(data.end[0], data.end[1]);
-    cxt.stroke();
-    cxt.closePath();
-  } else if (data.shape == "line") {
-    if ($("#layer" + data.userid).get(0) !== undefined) {
-      $("#layer" + data.userid).get(0).getContext('2d')
-          .clearRect(0, 0, 800, 600); // clear the users canvas
-    }
-    cxt.beginPath();
-    cxt.moveTo(data.start[0], data.start[1]);
-    cxt.lineTo(data.end[0], data.end[1]);
-    cxt.stroke();
-    cxt.closePath();
-  } else if (data.shape == "rect") {
-    if ($("#layer" + data.userid).get(0) !== undefined) {
-      $("#layer" + data.userid).get(0).getContext('2d')
-          .clearRect(0, 0, 800, 600); // clear the users canvas
-    }
-    cxt.fillRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
-    cxt.strokeRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
-  } else if (data.shape == "rect") {
-  } else if (data.shape == "ellipse") {
-  } else if (data.shape == "eraser") {
+  switch (data.shape) {
+    case "pen":
+      cxt.beginPath();
+      cxt.moveTo(data.start[0], data.start[1]);
+      cxt.lineTo(data.end[0], data.end[1]);
+      cxt.stroke();
+      cxt.closePath();
+      break;
+    case "line":
+      if ($("#layer" + data.userid).get(0) !== undefined) {
+        $("#layer" + data.userid).get(0).getContext('2d')
+            .clearRect(0, 0, 800, 600); // clear the users canvas
+      }
+      cxt.beginPath();
+      cxt.moveTo(data.start[0], data.start[1]);
+      cxt.lineTo(data.end[0], data.end[1]);
+      cxt.stroke();
+      cxt.closePath();
+      break;
+    case "rect":
+      if ($("#layer" + data.userid).get(0) !== undefined) {
+        $("#layer" + data.userid).get(0).getContext('2d')
+            .clearRect(0, 0, 800, 600); // clear the users canvas
+      }
+      cxt.fillRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
+      cxt.strokeRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
+      break;
+    case "ellipse":
+      break;
+    case "eraser":
+      break;
   }
   if (data.username != username_g) {
     $("#detector").get(0).getContext('2d')
@@ -159,21 +180,16 @@ function draw_canvas(data) {
   }
 }
 
-function canvas_clear_username(e) {
-}
-
 function canvas_mousedown(e) {
-  // Here we send a message start_msg to notify the server the do the following:
-  // 1. push the buffer into the database or delete the buffer (if just undoed)
-  // 2. put the user's canvas at the top of all the canvases
   mousedown = 1;
   drawing = 1;
   var action = {
     action: "begin_seg",
     userid: userid_g,
-    undoed: undo
+    undoed: undoed
   };
   ws.send(JSON.stringify(action));
+  undoed = 0;
 }
 
 function canvas_mouseup(e) {
@@ -268,7 +284,7 @@ function canvas_mouseover(e) {
     var action = {
       action: "begin_seg",
       userid: userid_g,
-      undoed: undo
+      undoed: undoed
     };
     ws.send(JSON.stringify(action));
   }
@@ -280,13 +296,45 @@ function canvas_mouseout(e) {
   last_y = -1;
 }
 
+function undo() {
+  if (!undoed) {
+    undoed = 1;
+    var action = {
+      action: "undo",
+      userid: userid_g,
+    };
+    ws.send(JSON.stringify(action));
+  }
+}
+
+function redo() {
+  if (undoed) {
+    undoed = 0;
+    var action = {
+      action: "redo",
+      userid: userid_g
+    };
+    ws.send(JSON.stringify(action));
+  }
+}
+
+function send_chat() {
+  var action = {
+    action: "chat",
+    username: username_g,
+    time: new Date().toString(),
+    content: "mobai"
+  };
+  ws.send(JSON.stringify(action));
+}
+
 function login() {
   var set_name = function() {
     var name = $("#name_input").val();
     if (name != '') {
       $("#name_dialog").dialog("close");
       username_g = name;
-      $("#top_bar").html("<p>" + name + "</p>");
+      $("#username").text(name);
       init_socket();
     }
   };
