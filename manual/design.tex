@@ -119,7 +119,7 @@ more elegant}.\\
 
 \subsection{Multiple Canvas Mechanism}
 \emph{The most interesting and complicated part of this application is the implementation of the multiple canvas 
-mechanism and it is adapted for several reasons.}
+mechanism and it is adapted for several reasons.}\\
 
 Firstly, it would be very inconvenient if a painter does not have undo and redo functions. 
 The implementation of these functions is so trivial on local, non-interactive canvas applications, 
@@ -145,12 +145,38 @@ Since now we only support single-step undo and redo (multiple-step undo and redo
 difficult if we don't have good enough network speed to transfer the entire canvas for each undo and 
 redo), we need to store the segments that are not going to be removed.\\
 \item
-\emph{User's Layers}: Each user has its own layer
+\emph{User's Layers}: Each user has its own layer on which the latest line segment is drawn. When the 
+user press down the mouse button, the corresponding layer will be cleared and the line segment is moved 
+to the base canvas. Undo and redo can easily be implemented in this way: just clearing (undo) and restoring 
+the user's layer will work.\\
 \item
-\emph{Detector Canvas}:
+\emph{Detector Canvas}: Since only the uppermost layer can detect user's mouseevent, we add another layer 
+to the top of all the canvases. We set the mouseevents for this canvas, so that we can detect the 
+events without having to change too much of the webpage.\\
 \end{itemize}
 
+However, a problem arises with the implementation of multiple canvas. That is the layer overlay. We must 
+have some user's layer above other users' layer and if that user draw a huge, black rectangle on his or 
+her own layer and do not push it to the base canvas by another mouseclick, others will not be able to see 
+what they drew, because their segments will be blocked by the rectangle. To solve this problem, every time 
+a user presses the mouse down, his or her layer would be put above all the other's layers and then this 
+problem is solved. Now whoever draws the last segment will have his or her segment above all the others'.\\
+
+To efficiently change the arrangement of the layers, jQuery helped us a lot because it provides us a lot 
+of APIs for dynamically changing the HTML file of the webpage. We can insert a new layer when a new user 
+enters, delete a layer when the corresponding user leaves and change the order of the layers all by one 
+function call.\\
+
 \subsection{Upload and Download}
+\emph{Without upload and download functionalities, the application would not be as practical as it is. 
+The implementation of upload and download actually enables the users to save the work. And if the user 
+has a existing picture to be drawn on, he or she can merely do it within a few mouseclicks and drags.}\\
+
+We can find the buttons for saving and uploading at the top-right corner of the webpage. They are quite 
+user friendly and users will benefit a lot with these functionalities.\\
+
+The implementation also requires the communication between the client-side and server-side. We need to 
+store the picture in the database and send it to all the other users.\\
 
 \section{Web Frameworks}
 \emph{In this section we will introduce the framework we used for development, 
@@ -215,7 +241,28 @@ HTML5 and the client-side programs.\\
 lecture notes, made use of the CGI-like framework and WebSocket. Huge amount of data transfer between the 
 server side and the client side is done. Without the course materials we would have found it 
 much more difficult to understand the mechanism.\\
+\end{itemize}
 
+\section{Further Development}
+\emph{We think this application is worth further development. We will add some features and 
+improve the appearance in the future and develop it into a fully operational web application.}\\
+
+\begin{itemize}
+\item
+\emph{Get a Server}: We will buy or use a free server to install our application. Then we are free 
+to do something big without using our own machines for temporary testing.\\
+
+\item
+\emph{Signing Up}: We are going to implement the register function and thus each client can have 
+his or her own workspace to store and manage the works. In this way each user will have an account 
+and some space.\\
+
+\item
+\emph{Online Saving}: Since each user can have a workspace, we can allocate each of them some storage 
+to store the works.\\
+
+\item
+\emph{Sharing}: Users will be able to share works with other users.\\
 \end{itemize}
 
 \end{document}

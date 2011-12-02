@@ -39,7 +39,7 @@ function time_out() {
 function init_socket() {
   setInterval(time_out, 20); // allow mouse move detection every 20 milliseconds
 
-  ws = new WebSocket('ws://143.89.218.59:3389/server');
+  ws = new WebSocket('ws://localhost:3389/server');
 
   ws.onopen = function() {
     var action = { // new a user
