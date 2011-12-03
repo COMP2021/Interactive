@@ -5,6 +5,9 @@
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <!-- miniColors declaration -->
+    <script type="text/javascript" src="/scripts/jquery-miniColors/jquery.miniColors.js"></script>
+    <link type="text/css" rel="stylesheet" href="/scripts/jquery-miniColors/jquery.miniColors.css" />
     <script src="/scripts/ui.js"></script>
     <script src="/scripts/scripts.js"></script>
     <style type="text/css">
@@ -194,8 +197,8 @@
           <li id="tool_eraser">Eraser</li>
           <li id="tool_undo">Undo</li>
           <li id="tool_redo">Redo</li>
-          <li id="tool_fg">Foreground</li>
-          <li id="tool_bg">Background</li>
+          <li id="tool_fg">Foreground<input id="fg_name" type="hidden" name="fg_name" value="color" /></li>
+          <li id="tool_bg">Background<input id="bg_name" type="hidden" name="bg_name" value="color" /></li>
           <li id="tool_width">Width</li>
           <li id="tool_fill">Fill</li>
         </ul>
