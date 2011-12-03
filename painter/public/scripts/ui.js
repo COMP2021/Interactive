@@ -119,14 +119,6 @@ function fgColor_out(){
 }
 
 function fgColor_clicked(){
-  //TODO: update the fgColor.
-  $("#fg_name").show().miniColors({
-    change: function(hex, rgb){
-              //TODO
-              console.log(rgb);
-              console.log(hex);
-           $("#fg_name").miniColors('destroy');
-            }});
 }
 
 function bgColor_over(){
@@ -140,7 +132,6 @@ function bgColor_out(){
 }
 
 function bgColor_clicked(){
-  //Wait for fg to complete.
 }
 
 function undo_over() {
@@ -205,6 +196,14 @@ function chat_out() {
 
 function init_tools() {
   $("#tools").menu();
+  $("#fg_name").show().miniColors({
+    change: function(hex, rgb){
+              currfg_g = [rgb.r, rgb.g, rgb.b];
+            }});
+  $("#bg_name").show().miniColors({
+    change: function(hex, rgb){
+              currbg_g = [rgb.r, rgb.g, rgb.b];
+            }});
 
   //Add all hover and mousedown function links.
   $("#tool_pen").hover(pen_over, pen_out);
