@@ -64,6 +64,7 @@ sub exec_new_user_req {
   my ($username, $client_id) = @_;
   my $json = Mojo::JSON->new;
   my @allids = ();
+  my @allnames = ();
   foreach my $key (keys(%clients)) {
     if ($clients{$key}->get_cname() eq $username) { # username already in use
       my $data_negative = $json->encode( {
@@ -84,6 +85,7 @@ sub exec_new_user_req {
   foreach my $id (keys(%clients)) {
     if ($id != $client_id) {
       push(@allids, $id);
+      push(@allnames, $clients{$id}->get_cname());
     }
   }
   my @segs = parse_database_and_buffer();
@@ -93,6 +95,7 @@ sub exec_new_user_req {
     permission => 1,
     userid => $client_id,
     allid => \@allids,
+    allname => \@allnames,
     segs => \@segs,
     chats => \@chats
   });
@@ -102,6 +105,7 @@ sub exec_new_user_req {
   my $data_canvas = $json->encode( {
     action => "new_canvas",
     userid => $client_id,
+    username => $username
   });
   return $data_canvas;
 }
@@ -149,6 +153,16 @@ sub exec_beginseg_req {
     userid => $userid,
     undoed => $undoed,
     segs => \@segs_to_base
+  });
+  return $data;
+}
+
+sub exec_endseg_req {
+  my $userid = $_[0];
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "end_seg",
+    userid => $userid
   });
   return $data;
 }
@@ -226,6 +240,10 @@ sub exec_msg {
         $data->{"userid"},
         $data->{"undoed"}
     );
+  } elsif ($action eq "end_seg") { # ending a seg at mouse up
+    exec_endseg_req(
+        $data->{"userid"}
+    );
   } elsif ($action eq "undo") { # undo
     exec_undo_req(
         $data->{"userid"}
@@ -252,6 +270,24 @@ sub send_msg_to_all {
   }
 }
 
+# when the user logs out, clear the data and send a message to all the others
+sub user_logout {
+  my ($client_id) = $_[0];
+  my $username = $clients{$client_id}->get_cname();
+  buffer2db($client_id); # push the remaining data in the buffer to the database
+  dump_buffer($client_id); # clear the user's buffer
+  delete $clients{$client_id};
+
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "user_logout",
+    username => $username,
+  });
+  foreach my $id (keys(%clients)) {
+    $clients{$id}->get_wsclient()->send_message($data); # send back msg with no permission
+  }
+}
+
 # server side, deal with the data the client side sends
 websocket '/server' => sub {
   my $self = shift; # $self is the current client
@@ -267,9 +303,7 @@ websocket '/server' => sub {
 
   # connection closed
   $self->on_finish(sub {
-    buffer2db($client_id); # push the remaining data in the buffer to the database
-    dump_buffer($client_id); # clear the user's buffer
-    delete $clients{$client_id};
+    user_logout($client_id);
   });
 
   # The following is the server/client interface:

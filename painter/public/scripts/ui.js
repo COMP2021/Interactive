@@ -227,6 +227,14 @@ function chat_out() {
   $(this).css("background", "#FFF");
 }
 
+function user_over() {
+  $(this).css("background", "#EEE");
+}
+
+function user_out() {
+  $(this).css("background", "#FFF");
+}
+
 function talk_area_pressed(e) {
   if (e.ctrlKey && e.keyCode == 13) {
     send_chat();
@@ -290,6 +298,9 @@ function init_ui() {
 
   $(".chat_entry").live("mouseover", chat_over);
   $(".chat_entry").live("mouseout", chat_out);
+
+  $(".user_entry").live("mouseover", chat_over);
+  $(".user_entry").live("mouseout", chat_out);
 
   init_tools();
 }

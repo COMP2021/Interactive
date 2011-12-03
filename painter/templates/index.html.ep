@@ -86,9 +86,25 @@
         padding-left:30px;
         margin-bottom:30px;
       }
+      #online_user {
+        position:absolute;
+        left:10px;
+        top:180px;
+        width:130px;
+        height:300px;
+        border:1px solid #AAA;
+        overflow-x:hidden;
+        background-color:#FFF;
+        margin-bottom:10px;
+      }
+      #online_user p {
+        display:inline;
+        font-family:Arial;
+        padding:5px 5px 5px 5px;
+      }
       canvas {
         position:absolute;
-        left:30px;
+        left:157px;
         top:180px;
         border:1px solid #AAA;
       }
@@ -97,9 +113,9 @@
       }
       #message_box {
         position:absolute;
-        left:850px;
+        left:970px;
         top:180px;
-        width:400px;
+        width:300px;
         height:430px;
         border:1px solid #AAA;
         overflow:scroll;
@@ -108,9 +124,9 @@
       }
       #talk_area {
         position:absolute;
-        left:850px;
+        left:970px;
         top:620px;
-        width:396px;
+        width:296px;
         height:100px;
         border:1px solid #AAA;
         overflow:scroll;
@@ -118,9 +134,35 @@
       }
       #send_btn {
         position:absolute;
-        left:900px;
+        left:970px;
         top:730px;
         padding:0px 60px 0px 60px;
+      }
+      #bottom_bar {
+        position:absolute;
+        left:0px;
+        top:790px;
+        width:100%;
+        background:#333;
+      }
+      #bottom_bar p {
+        display:inline;
+        float:right;
+        color:#FFF;
+        font-family:Arial;
+        padding-right:30px;
+      }
+      #bottom_bar p a {
+        text-decoration:none;
+        color:#FFF;
+      }
+      #bottom_bar p a:visited {
+        text-decoration:none;
+        color:#FFF;
+      }
+      #bottom_bar p a:hover {
+        text-decoration:none;
+        color:#FFF;
       }
       .inline {
         display:inline;
@@ -128,7 +170,7 @@
       #tools {
         position:absolute;
         left:40px;
-        top:136px;
+        top:133px;
       }
       #tools li {
         float:left;
@@ -203,6 +245,7 @@
           <li id="tool_fill">Fill</li>
         </ul>
       </div>
+      <div id="online_user"></div>
       <div id="canvas_container">
         <canvas id="canvas" width="800" height="600"></canvas>
         <canvas id="detector" width="800" height="600"></canvas>
@@ -210,8 +253,13 @@
       <div id="message_box"></div>
       <textarea id="talk_area"></textarea>
       <div id="send_btn">Send (Ctrl + Enter)</div>
+      <div id="bottom_bar">
+        <p>
+          <a href="https://github.com/COMP2021/Interactive">Source code (Github)</a>
+        </p>
+      <div>
       <div id="name_dialog">
-        <p>Enter your name</p>
+        <p>Please put your name here<br />(no more than 16 characters):</p>
         <input id="name_input" type="text"/>
       </div>
       <div id="setting_menu">

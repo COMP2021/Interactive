@@ -27,6 +27,9 @@ var color_arr = [
   "#ee82ee", // violet
 ];
 
+// used to store all the users that have logged in
+var usernames = [];
+
 // Following are the global variables describing the user's current state,
 // when changing the properties using the toolbar or others, just update
 // these variables
@@ -47,7 +50,7 @@ function time_out() {
 }
 
 function init_socket() {
-  setInterval(time_out, 20); // allow mouse move detection every 20 milliseconds
+  setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
 
   ws = new WebSocket('ws://localhost:3389/server');
 
@@ -81,11 +84,20 @@ function init_socket() {
         for (var i = 0; i < data.chats.length; i++) {
           chat_received(jQuery.parseJSON(data.chats[i]));
         }
+        for (var i = 0; i < data.allname.length; i++) {
+          add_user_display(data.allname[i]);
+        }
         break;
       case "new_canvas":
         if (data.userid != -1) {
           add_canvas(data.userid);
+          if (data.username != username_g) {
+            add_user_display(data.username);
+          }
         }
+        break;
+      case "user_logout":
+        delete_user_display(data.username);
         break;
       case "draw":
         draw_canvas(data);
@@ -95,6 +107,10 @@ function init_socket() {
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
         }
+        break;
+      case "end_seg":
+        $("#detector").get(0).getContext('2d')
+            .clearRect(buf_x - 20, buf_y - 20, 150, 80); // clear the detector canvas
         break;
       case "undo":
         $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, 800, 600);
@@ -120,6 +136,36 @@ function init_detector() {
   $("#detector").mousemove(canvas_mousemove);
   $("#detector").mouseover(canvas_mouseover);
   $("#detector").mouseout(canvas_mouseout);
+}
+
+// check whether a user has logged in before or not
+function is_new_user(username) {
+  for (var i = 0; i < usernames.length; i++) {
+    if (usernames[i] == username) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// add a user to the online user display when a new user is in
+function add_user_display(username) {
+  if (is_new_user(username)) { // a new user that never logged in before
+    usernames.push(username); // store the username in the array
+    var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
+    $("#online_user").append(user_entry);
+  } else { // a user that have logged in
+    $("#user_" + username + " p").css("color", "#000");
+    $("#user_" + username).insertAfter($("#user_" + username_g));
+  }
+}
+
+// delete a user from the online user display when it logs out
+function delete_user_display(username) {
+  $("#user_" + username + " p").remove();
+  var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
+  $("#online_user").append(user_entry); // put the user's name to the last place
+  $("#user_" + username + " p").css("color", "#CCC");
 }
 
 function add_canvas(canvas_id) {
@@ -198,10 +244,12 @@ function draw_canvas(data) {
 
     cxt = $("#detector").get(0).getContext('2d');
     cxt.strokeStyle = data.usercolor;
-    cxt.clearRect(0, 0, 800, 600); // clear the detector canvas
+    cxt.clearRect(buf_x - 20, buf_y - 20, 150, 80); // clear the detector canvas
     cxt.strokeRect(x + 2, y + 2, rect_len, 15);
     cxt.fillText(data.username, x + 10, y + 12);
   }
+  buf_x = x;
+  buf_y = y;
 }
 
 function chat_received(data) {
@@ -232,6 +280,11 @@ function canvas_mouseup(e) {
   drawing = 0;
   last_x = -1;
   last_y = -1;
+  var action = {
+    action: "end_seg",
+    userid: userid_g
+  };
+  ws.send(JSON.stringify(action));
 }
 
 function canvas_mousemove(e) {
@@ -373,11 +426,12 @@ function send_chat() {
 function login() {
   var set_name = function() {
     var name = $("#name_input").val();
-    if (name != '') {
+    if (name != '' && name.length <= 16) {
       $("#name_dialog").dialog("close");
       username_g = name;
       $("#username").text(name);
       init_socket();
+      add_user_display(name);
     }
   };
 
