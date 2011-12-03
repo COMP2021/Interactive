@@ -14,6 +14,7 @@ function setting_out() {
 }
 
 function setting_clicked() {
+  /*
   if (setting_clked) {
     setting_clked = false;
   } else {
@@ -25,6 +26,7 @@ function setting_clicked() {
   $("#setting_menu").css("top", 24);
   $("#setting_menu").css("left", left - 60);
   $("#setting_menu").show();
+  */
 }
 
 function saveas_over() {
@@ -225,16 +227,24 @@ function chat_out() {
   $(this).css("background", "#FFF");
 }
 
+function talk_area_pressed(e) {
+  if (e.ctrlKey && e.keyCode == 13) {
+    send_chat();
+  }
+}
+
 function init_tools() {
   $("#tools").menu();
   $("#fg_name").show().miniColors({
     change: function(hex, rgb){
               currfg_g = [rgb.r, rgb.g, rgb.b];
             }});
+  $("#fg_name").miniColors('value', '#000000');
   $("#bg_name").show().miniColors({
     change: function(hex, rgb){
               currbg_g = [rgb.r, rgb.g, rgb.b];
             }});
+  $("#bg_name").miniColors('value', '#FFFFFF');
 
   //Add all hover and mousedown function links.
   $("#tool_pen").hover(pen_over, pen_out);
@@ -269,6 +279,8 @@ function init_ui() {
 
   $("#setting").hover(setting_over, setting_out);
   $("#setting").mousedown(setting_clicked);
+
+  $("#talk_area").keydown(talk_area_pressed);
 
   $("#send_btn").button();
   $("#send_btn").click(send_chat);

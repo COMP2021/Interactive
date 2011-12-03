@@ -196,16 +196,11 @@ function draw_canvas(data) {
     var x = data.end[0];
     var y = data.end[1];
 
-    $("#detector").get(0).getContext('2d')
-        .clearRect(0, 0, 800, 600); // clear the detector canvas
-
-    $("#detector").get(0).getContext('2d')
-        .strokeRect(x + 2, y + 2, rect_len, 15);
-
     cxt = $("#detector").get(0).getContext('2d');
+    cxt.strokeStyle = data.usercolor;
+    cxt.clearRect(0, 0, 800, 600); // clear the detector canvas
+    cxt.strokeRect(x + 2, y + 2, rect_len, 15);
     cxt.fillText(data.username, x + 10, y + 12);
-    // buf_x = data.end[0];
-    // buf_y = data.end[1];
   }
 }
 
@@ -261,7 +256,8 @@ function canvas_mousemove(e) {
               bg: currbg_g,
               width: currwidth_g,
               fill: currfill_g,
-              tentative: 1
+              tentative: 1,
+              usercolor: usercolor_g
             };
             ws.send(JSON.stringify(action));
             last_x = x_pos;
@@ -283,7 +279,8 @@ function canvas_mousemove(e) {
               bg: currbg_g,
               width: currwidth_g,
               fill: currfill_g,
-              tentative: 1
+              tentative: 1,
+              usercolor: usercolor_g
             };
             ws.send(JSON.stringify(action));
           }
@@ -303,7 +300,8 @@ function canvas_mousemove(e) {
               bg: currbg_g,
               width: currwidth_g,
               fill: currfill_g,
-              tentative: 1
+              tentative: 1,
+              usercolor: usercolor_g
             };
             ws.send(JSON.stringify(action));
           }

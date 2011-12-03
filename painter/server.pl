@@ -108,7 +108,7 @@ sub exec_new_user_req {
 
 # deals with the msg for painting, returns the msg to be sent back
 sub exec_draw_req {
-  my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill, $tttv) = @_;
+  my ($userid, $shape, $start, $end, $fg, $bg, $width, $fill, $tttv, $usercolor) = @_;
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "draw",
@@ -121,7 +121,8 @@ sub exec_draw_req {
     bg => $bg,
     width => $width,
     fill => $fill,
-    tentative => $tttv
+    tentative => $tttv,
+    usercolor => $usercolor
   });
   if ($shape eq "pen") {
     append_to_buffer($userid, $data);
@@ -217,7 +218,8 @@ sub exec_msg {
         $data->{"bg"}, 
         $data->{"width"}, 
         $data->{"fill"},
-        $data->{"tentative"}
+        $data->{"tentative"},
+        $data->{"usercolor"}
     );
   } elsif ($action eq "begin_seg") { # starting a new seg at mouseclick
     exec_beginseg_req(

@@ -118,9 +118,9 @@
       }
       #send_btn {
         position:absolute;
-        left:910px;
+        left:900px;
         top:730px;
-        padding:0px 100px 0px 100px;
+        padding:0px 60px 0px 60px;
       }
       .inline {
         display:inline;
@@ -209,7 +209,7 @@
       </div>
       <div id="message_box"></div>
       <textarea id="talk_area"></textarea>
-      <div id="send_btn">Send</div>
+      <div id="send_btn">Send (Ctrl + Enter)</div>
       <div id="name_dialog">
         <p>Enter your name</p>
         <input id="name_input" type="text"/>
