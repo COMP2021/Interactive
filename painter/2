@@ -71,7 +71,7 @@ function init_socket() {
         }
         init_detector();
         userid_g = data.userid; // assign an id to the user
-        usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed after it
+        usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed
         for (var i = 0; i < data.allid.length; i++) {
           add_canvas(data.allid[i]); // add the existing canvases
         }
@@ -210,8 +210,7 @@ function draw_canvas(data) {
 }
 
 function chat_received(data) {
-  console.log(data.color);
-  var username = "<p class=\"chat_name\"><font color=" + data.color + ">" + data.username + "</font></p>";
+  var username = "<p class=\"chat_name\">" + data.username + "</p>";
   var time = "<p class=\"chat_time\">" + data.time + "</p>";
   var content = "<p class=\"chat_content\">" + data.content + "</p>";
   var chat_entry = "<div class=\"chat_entry\">" + username + time + content + "</div>";
@@ -364,8 +363,7 @@ function send_chat() {
       action: "chat",
       username: username_g,
       time: new Date().toString(),
-      content: $("#talk_area").val(),
-      color: usercolor_g
+      content: $("#talk_area").val()
     };
     ws.send(JSON.stringify(action));
     $("#talk_area").val("");

@@ -178,7 +178,7 @@ sub exec_redo_req {
 
 # dealw with chatting
 sub exec_chat_req {
-  my ($username, $time, $content) = @_;
+  my ($username, $time, $content, $color) = @_;
   my $json = Mojo::JSON->new;
   my $fmt_time;
   if ($time =~ /(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)/) { # parse time into readable format
@@ -188,7 +188,8 @@ sub exec_chat_req {
     action => "chat",
     username => $username,
     time => $fmt_time,
-    content => $content
+    content => $content,
+    color => $color
   });
   insert_chatdb($data);
   return $data;
@@ -235,7 +236,8 @@ sub exec_msg {
     exec_chat_req(
         $data->{"username"},
         $data->{"time"},
-        $data->{"content"}
+        $data->{"content"},
+        $data->{"color"}
     );
   }
 }

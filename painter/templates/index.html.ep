@@ -131,6 +131,7 @@
         float:left;
         padding-left:10px;
         padding-right:10px;
+        border:1px solid #FFF;
       }
       .tool_icon {
         width:24px;

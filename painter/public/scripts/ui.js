@@ -52,7 +52,8 @@ function pen_out() {
 }
 
 function pen_clicked() {
-  set_tool("pen");
+  clear_curr_tool();
+  set_focused("pen");
 }
 
 function line_over() {
@@ -66,7 +67,8 @@ function line_out() {
 }
 
 function line_clicked() {
-  set_tool("line");
+  clear_curr_tool();
+  set_focused("line");
 }
 
 function rect_over() {
@@ -80,6 +82,8 @@ function rect_out() {
 }
 
 function rect_clicked() {
+  clear_curr_tool();
+  set_focused("rect");
 }
 
 function ellipse_over() {
@@ -93,6 +97,8 @@ function ellipse_out() {
 }
 
 function ellipse_clicked() {
+  clear_curr_tool();
+  set_focused("ellipse");
 }
 
 function eraser_over() {
@@ -106,6 +112,8 @@ function eraser_out() {
 }
 
 function eraser_clicked() {
+  clear_curr_tool();
+  set_focused("eraser");
 }
 
 function fgColor_over(){
@@ -154,6 +162,7 @@ function undo_out() {
 }
 
 function undo_clicked(){
+  undo();
 }
 
 function redo_over(){
@@ -167,6 +176,7 @@ function redo_out(){
 }
 
 function redo_clicked() {
+  redo();
 }
 
 function width_over(){
@@ -182,6 +192,7 @@ function width_out(){
 function width_clicked(){
 
 }
+
 function fill_over(){
   $("#tool_fill").css("color", "#FFF");
   $("#tool_fill").css("background", "#CCC");
@@ -193,6 +204,26 @@ function fill_out(){
 }
 
 function fill_clicked(){
+  if (currfill_g) {
+    currfill_g = 0;
+    $("#tool_fill").css("border", "1px solid #FFF");
+  } else {
+    currfill_g = 1;
+    $("#tool_fill").css("border", "1px solid #999");
+  }
+}
+
+function set_focused(tool) { // set the current tool focused by showing border
+  $("#tool_" + tool).css("border", "1px solid #999");
+  currtool_g = tool;
+}
+
+function clear_curr_tool() {
+  $("#tool_pen").css("border", "1px solid #FFF");
+  $("#tool_line").css("border", "1px solid #FFF");
+  $("#tool_rect").css("border", "1px solid #FFF");
+  $("#tool_ellipse").css("border", "1px solid #FFF");
+  $("#tool_eraser").css("border", "1px solid #FFF");
 }
 
 function chat_over() {
@@ -229,13 +260,14 @@ function init_tools() {
   $("#tool_width").mousedown(width_clicked);
   $("#tool_fill").hover(fill_over, fill_out);
   $("#tool_fill").mousedown(fill_clicked);
+
+  pen_clicked();
 }
 
 function init_ui() {
   $("#setting_menu").hide();
   $("#setting_menu").mouseover(setting_clicked);
 
-  init_tools();
   $("#setting").hover(setting_over, setting_out);
   $("#setting").mousedown(setting_clicked);
 
@@ -247,4 +279,6 @@ function init_ui() {
 
   $(".chat_entry").live("mouseover", chat_over);
   $(".chat_entry").live("mouseout", chat_out);
+
+  init_tools();
 }
