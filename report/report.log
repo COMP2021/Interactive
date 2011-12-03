@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.14)  2 DEC 2011 23:38
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.14)  2 DEC 2011 23:43
 entering extended mode
  %&-line parsing enabled.
-**design.tex
-(./design.tex
+**report.tex
+(./report.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
 yphenation, loaded.
@@ -30,8 +30,8 @@ Package: parskip 2001/04/09 non-zero parskip adjustments
 LaTeX Warning: Unused global option(s):
     [3p].
 
-(./design.aux)
-\openout1 = `design.aux'.
+No file report.aux.
+\openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
@@ -289,14 +289,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 265--266
 
  []
 
-[7] (./design.aux) ) 
+[7] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 265 strings out of 495062
- 3061 string characters out of 1182643
+ 263 strings out of 495062
+ 3039 string characters out of 1182643
  51227 words of memory out of 3000000
  3509 multiletter control sequences out of 15000+50000
  9201 words of font info for 32 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  21i,6n,21p,197b,219s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on design.dvi (7 pages, 20088 bytes).
+Output written on report.dvi (7 pages, 20088 bytes).

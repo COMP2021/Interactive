@@ -195,6 +195,14 @@ function fill_out(){
 function fill_clicked(){
 }
 
+function chat_over() {
+  $(this).css("background", "#EEE");
+}
+
+function chat_out() {
+  $(this).css("background", "#FFF");
+}
+
 function init_tools() {
   $("#tools").menu();
 
@@ -231,8 +239,12 @@ function init_ui() {
   $("#setting").hover(setting_over, setting_out);
   $("#setting").mousedown(setting_clicked);
 
-  $("#send_button").button();
+  $("#send_btn").button();
+  $("#send_btn").click(send_chat);
 
   $("#saveas_div").hover(saveas_over, saveas_out);
   $("#saveas_div").mousedown(saveas_clicked);
+
+  $(".chat_entry").live("mouseover", chat_over);
+  $(".chat_entry").live("mouseout", chat_out);
 }

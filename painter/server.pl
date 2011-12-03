@@ -70,7 +70,7 @@ sub exec_new_user_req {
         action => "new_user",
         permission => 0,
       });
-      $clients{$client_id}->get_wsclient()->send_message($data_negative); # send back msg without permission
+      $clients{$client_id}->get_wsclient()->send_message($data_negative); # send back msg with no permission
       my $data_invalid = $json->encode( {
         action => "new_canvas",
         userid => -1
@@ -87,15 +87,17 @@ sub exec_new_user_req {
     }
   }
   my @segs = parse_database_and_buffer();
+  my @chats = get_chatdb();
   my $data_user = $json->encode( {
     action => "new_user",
     permission => 1,
     userid => $client_id,
     allid => \@allids,
-    segs => \@segs
+    segs => \@segs,
+    chats => \@chats
   });
   $clients{$client_id}->get_wsclient()->send_message($data_user); # send all the canvases to the new user
-
+  
   # send part: send to all the users
   my $data_canvas = $json->encode( {
     action => "new_canvas",
@@ -150,9 +152,6 @@ sub exec_beginseg_req {
   return $data;
 }
 
-sub exec_chat_req {
-}
-
 # deals with the msg for undoing
 sub exec_undo_req {
   my $userid = $_[0];
@@ -181,12 +180,17 @@ sub exec_redo_req {
 sub exec_chat_req {
   my ($username, $time, $content) = @_;
   my $json = Mojo::JSON->new;
+  my $fmt_time;
+  if ($time =~ /(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)/) { # parse time into readable format
+    $fmt_time = "$5:$6 $1 $2 $3 $4";
+  }
   my $data = $json->encode( {
     action => "chat",
     username => $username,
-    time => $time,
+    time => $fmt_time,
     content => $content
   });
+  insert_chatdb($data);
   return $data;
 }
 

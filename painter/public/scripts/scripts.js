@@ -17,6 +17,16 @@ var undoed = 0;
 
 var timeout = true; // if true, then we can detect mouse moves, used to prevent too much data transfer
 
+// colors for username display
+var color_arr = [
+  "#ffdab9", // peach puff
+  "#87cefa", // light sky blue
+  "#adff2f", // green yellow
+  "#ffd700", // gold
+  "#ff6347", // tomato
+  "#ee82ee", // violet
+];
+
 // Following are the global variables describing the user's current state,
 // when changing the properties using the toolbar or others, just update
 // these variables
@@ -61,11 +71,15 @@ function init_socket() {
         }
         init_detector();
         userid_g = data.userid; // assign an id to the user
+        console.log(data);
         for (var i = 0; i < data.allid.length; i++) {
           add_canvas(data.allid[i]); // add the existing canvases
         }
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
+        }
+        for (var i = 0; i < data.chats.length; i++) {
+          chat_received(jQuery.parseJSON(data.chats[i]));
         }
         break;
       case "new_canvas":
@@ -91,6 +105,7 @@ function init_socket() {
         }
         break;
       case "chat":
+        chat_received(data);
         break;
     }
   };
@@ -169,15 +184,33 @@ function draw_canvas(data) {
     case "eraser":
       break;
   }
+  // draw the username at the end of the line segment
   if (data.username != username_g) {
+    var name_len = data.username.length;
+    var rect_len = 16 + name_len * 6;
+    var x = data.end[0];
+    var y = data.end[1];
+
     $("#detector").get(0).getContext('2d')
-        .clearRect(buf_x - 40, buf_y - 40, 100, 80); // clear the detector canvas
+        .clearRect(0, 0, 800, 600); // clear the detector canvas
+
+    $("#detector").get(0).getContext('2d')
+        .strokeRect(x + 2, y + 2, rect_len, 15);
+
     cxt = $("#detector").get(0).getContext('2d');
-    cxt.fillStyle = "#FF0000";
-    cxt.fillText(data.username, data.end[0], data.end[1]);
-    buf_x = data.end[0];
-    buf_y = data.end[1];
+    cxt.fillText(data.username, x + 10, y + 12);
+    // buf_x = data.end[0];
+    // buf_y = data.end[1];
   }
+}
+
+function chat_received(data) {
+  var username = "<p class=\"chat_name\">" + data.username + "</p>";
+  var time = "<p class=\"chat_time\">" + data.time + "</p>";
+  var content = "<p class=\"chat_content\">" + data.content + "</p>";
+  var chat_entry = "<div class=\"chat_entry\">" + username + time + content + "</div>";
+
+  $("#message_box").append(chat_entry);
 }
 
 function canvas_mousedown(e) {
@@ -319,13 +352,16 @@ function redo() {
 }
 
 function send_chat() {
-  var action = {
-    action: "chat",
-    username: username_g,
-    time: new Date().toString(),
-    content: "mobai"
-  };
-  ws.send(JSON.stringify(action));
+  if ($("#talk_area").val()) {
+    var action = {
+      action: "chat",
+      username: username_g,
+      time: new Date().toString(),
+      content: $("#talk_area").val()
+    };
+    ws.send(JSON.stringify(action));
+    $("#talk_area").val("");
+  }
 }
 
 function login() {
