@@ -1,3 +1,5 @@
-This is a painter that enables multiple user to draw on it at the same time.
+An HTML5 canvas and Websocket application.
+
+Provides a workspace in which several users can draw on a canvas.
 
 Project of COMP2021, HKUST.
