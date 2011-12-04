@@ -195,8 +195,9 @@ sub exec_chat_req {
   if ($time =~ /(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)\W(\w+)/) { # parse time into readable format
     $fmt_time = "$5:$6 $1 $2 $3 $4";
   }
-  $content =~ s/fuck/\*\*\*/g;
-  $content =~ s/\</\&lt\;/g;
+  $content =~ s/\</\&lt\;/g; # escape "<" to prevent injection
+  $content =~ s/fuck/\*\*\*/gi; # just for fun
+  $content =~ s/64/\*\*\*/g; # just for fun
   my $data = $json->encode( {
     action => "chat",
     username => $username,

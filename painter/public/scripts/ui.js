@@ -1,6 +1,11 @@
+/**
+ * This file is used for the UI settings.
+ * A lot of fancy stuff here.
+ */
 var setting_clked = false;
 var width_div_over = false;
 
+// a hashtable used to help shine or stop shining the usernames
 var shine_username_hash = {};
 
 // colors for username display
@@ -259,16 +264,19 @@ function fill_clicked(){
   }
 }
 
+// when the width is changed, change the number display
 function width_changed() {
   $("#width_display").text($("#width_slider").val());
   currwidth_g = $("#width_slider").val();
 }
 
-function set_focused(tool) { // set the current tool focused by showing border
+// set the current tool focused by showing border
+function set_focused(tool) {
   $("#tool_" + tool).css("border", "1px solid #999");
   currtool_g = tool;
 }
 
+// remove the border of all the tools, used before setting a new tool
 function clear_curr_tool() {
   $("#tool_pen").css("border", "1px solid #FFF");
   $("#tool_line").css("border", "1px solid #FFF");
@@ -277,14 +285,17 @@ function clear_curr_tool() {
   $("#tool_eraser").css("border", "1px solid #FFF");
 }
 
+// when the mouse is move onto a chat entry
 function chat_over() {
   $(this).css("background", "#EEE");
 }
 
+// when the mouse is moved out of a chat entry
 function chat_out() {
   $(this).css("background", "#FFF");
 }
 
+// when the mouse is move onto a user entry
 function user_over() {
   var id = $(this).attr("id");
   var regex = /user\_(.*)/;
@@ -294,6 +305,7 @@ function user_over() {
   }
 }
 
+// when the mouse is move out of a user entry
 function user_out() {
   var id = $(this).attr("id");
   var regex = /user\_(.*)/;
@@ -303,12 +315,14 @@ function user_out() {
   }
 }
 
+// detect the "Ctrl + Enter" keyevent to send the message
 function talk_area_pressed(e) {
   if (e.ctrlKey && e.keyCode == 13) {
     send_chat();
   }
 }
 
+// when the webpage is clicked. This is used only for closing the width dialog
 function page_clicked() {
   if (!width_div_over) {
     $("#width_div").hide();
@@ -316,6 +330,7 @@ function page_clicked() {
   }
 }
 
+// make the username shine when a user is drawing
 function username_shine(username, color) {
   if (username != username_g) { // do not shine the user's name
     $("#user_" + username).css("background-color", color);
@@ -345,6 +360,7 @@ function username_shine(username, color) {
   }
 }
 
+// stop the username shining when the user stops to draw
 function stop_username_shine(username) {
   if (username != username_g) {
     var id = shine_username_hash[username]; // get the id
@@ -354,8 +370,10 @@ function stop_username_shine(username) {
   }
 }
 
+// initialize the toolbar
 function init_tools() {
-  $("#tools").menu();
+  $("#tools").menu(); // make a menu of the tools
+
   $("#fg_name").show().miniColors({
     change: function(hex, rgb){
               currfg_g = [rgb.r, rgb.g, rgb.b];
@@ -394,38 +412,48 @@ function init_tools() {
   $("#tool_fill").hover(fill_over, fill_out);
   $("#tool_fill").mousedown(fill_clicked);
 
+  // this is for the width dialog implemented completely by myself
   $("#width_div").hover(width_dialog_over, width_dialog_out);
 
   pen_clicked();
 }
 
 function init_ui() {
-  $("#setting_menu").hide();
-  $("#setting_menu").mouseover(setting_clicked);
+  // $("#setting_menu").hide();
+  // $("#setting_menu").mouseover(setting_clicked);
 
+  // the setting icon on the top-right corner
   $("#setting").hover(setting_over, setting_out);
   $("#setting").mousedown(setting_clicked);
 
+  // when the user presses "Ctrl + Enter"
   $("#talk_area").keydown(talk_area_pressed);
 
+  // make a jQuery-UI style button
   $("#send_btn").button();
   $("#send_btn").click(send_chat);
 
+  // upload button on the top-right corner
   $("#upload_div").hover(upload_over, upload_out);
   $("#upload_div").mousedown(upload_clicked);
 
+  // saveas button on the top-right corner
   $("#saveas_div").hover(saveas_over, saveas_out);
   $("#saveas_div").mousedown(saveas_clicked);
 
+  // effects when the user moves the mouse on and out of the chat entries
   $(".chat_entry").live("mouseover", chat_over);
   $(".chat_entry").live("mouseout", chat_out);
 
+  // effects when the user moves the mouse on and out of the user entries
   $(".user_entry").live("mouseover", user_over);
   $(".user_entry").live("mouseout", user_out);
 
+  // hide the dialogs
   $("#coming_soon").hide();
   $("#username_in_use").hide();
 
+  // add a welcome message to the chatting area
   $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
       + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
   $(".chat_content").css("color", "#87CEFA");
@@ -433,5 +461,6 @@ function init_ui() {
 
   init_tools();
 
+  // also used for the width dialog
   $(document).mousedown(page_clicked);
 }

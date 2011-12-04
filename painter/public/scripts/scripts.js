@@ -3,48 +3,52 @@
  */
 var ws; // global websocket
 
-var drawing = 0;
-var mousedown = 0;
-var canvas_inited = 0;
+var CANVAS_WIDTH = 800;
+var CANVAS_HEIGHT = 600;
 
-var last_x = -1;
-var last_y = -1;
+var drawing = 0; // whether the user is now drawing
+var mousedown = 0;  // whether the mouse is pressed
+var canvas_inited = 0; // whether the canvas have been initialized
 
-var buf_x = 0;
-var buf_y = 0;
+var last_x = -1; // used to store the previous mouse location
+var last_y = -1; // used to store the previous mouse location
 
-var undoed = 0;
+var undoed = 0; // whether the user has just used "undo"
 
 var timeout = true; // if true, then we can detect mouse moves, used to prevent too much data transfer
 
-// used to store all the users that have logged in
-var usernames = [];
+var usernames = []; // used to store all the users that have logged in, useful for the "online user" display
 
-var userbufs = {};
+var userbufs = {}; // used to store the previous mouse locations of different users, for showing cursors when drawing
 
 // Following are the global variables describing the user's current state,
 // when changing the properties using the toolbar or others, just update
 // these variables
+
 var username_g; // name of the user
+
 var userid_g; // id of the user
+
 var currtool_g = "pen"; // the tool (shape) the user is using
+
 var currfg_g = [0, 0, 0]; // the current foreground color
+
 var currbg_g = [255, 255, 255]; // the current background color
+
 var currfill_g = 0; // whether to fill or not
+
 var currwidth_g = 1; // the current width of line
+
 var usercolor_g; // color used to display the user's name
 
-if ( WebSocket.__initialize ) {
-}
-
-function time_out() {
-  timeout = true;
-}
+WebSocket.__initialize; // initialize the websocket
 
 function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
-  ws = new WebSocket('ws://143.89.231.37:3389/server');
 
+  ws = new WebSocket('ws://143.89.167.149:3389/server');
+
+  // when the websocket is opened
   ws.onopen = function() {
     var action = { // new a user
       action: "new_user",
@@ -53,14 +57,14 @@ function init_socket() {
     ws.send(JSON.stringify(action));
   };
 
+  // on receiving a message
   ws.onmessage = function(e) { // when the client receives a message
-    var data = jQuery.parseJSON(e.data);
-    var action = data.action;
+    var data = jQuery.parseJSON(e.data); // data is the JSON string sent by the server
+    var action = data.action; // what the client should do
 
     switch (action) {
-      case "new_user":
-        if (!data.permission) {
-          // not permitted, display an error message
+      case "new_user": // adding a new user
+        if (!data.permission) { // not permitted, display an error message
           var dialogOpts = { // options
             buttons: {
               "Ok": function() {
@@ -76,26 +80,27 @@ function init_socket() {
               resizable: false,
             }
           );
-          // hide the title bar
           $(".ui-dialog-titlebar").hide(); // hide the title bar
         }
-        init_detector();
+        init_detector(); // initialize the "detector" canvas to detect mouse events
         userid_g = data.userid; // assign an id to the user
         usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed after it
         for (var i = 0; i < data.allid.length; i++) {
           add_canvas(data.allid[i]); // add the existing canvases
         }
         for (var i = 0; i < data.segs.length; i++) {
-          draw_canvas(jQuery.parseJSON(data.segs[i]));
+          draw_canvas(jQuery.parseJSON(data.segs[i])); // draw the segments from the server on the canvases
         }
         for (var i = 0; i < data.chats.length; i++) {
-          chat_received(jQuery.parseJSON(data.chats[i]));
+          chat_received(jQuery.parseJSON(data.chats[i])); // display the chattings on the chatting area
         }
         for (var i = 0; i < data.allname.length; i++) {
-          user_login(data.allname[i]);
+          user_login(data.allname[i]); //display the usernames on the user display area
         }
+        // clear the detectore canvas
+        $("#detector").get(0).getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         break;
-      case "new_canvas":
+      case "new_canvas": // add new canvas to the canvas container
         if (data.userid != -1) {
           add_canvas(data.userid);
           if (data.username != username_g) {
@@ -103,44 +108,36 @@ function init_socket() {
           }
         }
         break;
-      case "user_logout":
+      case "user_logout": // when the user logs out
         user_logout(data.username);
         break;
-      case "draw":
+      case "draw": // various line segments
         draw_canvas(data);
         break;
-      case "begin_seg":
+      case "begin_seg": // begin a segment
         move_canvas_to_top(data.userid);
         username_shine(data.username, color_arr[data.userid]);
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
         }
         break;
-      case "end_seg":
+      case "end_seg": // end a segment
         stop_username_shine(data.username);
         clear_usercap(data.username);
         break;
-      case "undo":
-        $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, 800, 600);
+      case "undo": // undo
+        $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         break;
-      case "redo":
+      case "redo": // redo
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
         }
         break;
-      case "chat":
+      case "chat": // received a chatting message
         chat_received(data);
         break;
     }
   };
-}
-
-function init_detector() {
-  $("#detector").mousedown(canvas_mousedown);
-  $("#detector").mouseup(canvas_mouseup);
-  $("#detector").mousemove(canvas_mousemove);
-  $("#detector").mouseover(canvas_mouseover);
-  $("#detector").mouseout(canvas_mouseout);
 }
 
 // add a user to the online user display when a new user is in
@@ -168,15 +165,19 @@ function user_logout(username) {
   clear_usercap(username);
 }
 
+// add a new layer to the canvas container
 function add_canvas(canvas_id) {
-  $("<canvas id=\"layer" + canvas_id + "\" class=\"layer\" width=\"800\" height=\"600\"></canvas>")
+  $("<canvas id=\"layer" + canvas_id + "\" class=\"layer\" width=\"" 
+      + CANVAS_WIDTH + "\" height=\"" + CANVAS_HEIGHT + "\"></canvas>")
       .insertAfter($("#canvas"));
 }
 
+// move a canvas to top of all the others
 function move_canvas_to_top(canvas_id) {
   $("#layer" + canvas_id).insertBefore($("#detector"));
 }
 
+// draw various segments on different canvases
 function draw_canvas(data) {
   var cxt;
   if (data.tentative) { // draw the the layers above
@@ -187,9 +188,10 @@ function draw_canvas(data) {
     cxt = $("#canvas").get(0).getContext('2d');
     if ($("#layer" + data.userid).get(0) !== undefined) {
       $("#layer" + data.userid).get(0).getContext('2d')
-          .clearRect(0, 0, 800, 600); // clear the canvas
+          .clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear the canvas
     }
   }
+  // parse the strings to hex
   var fgcolor = "#" + data.fg[0].toString(16) + 
       data.fg[1].toString(16) + data.fg[2].toString(16);
   var bgcolor = "#" + data.bg[0].toString(16) + 
@@ -198,6 +200,7 @@ function draw_canvas(data) {
   cxt.fillStyle = bgcolor;
   cxt.lineWidth = data.width;
   cxt.lineCap = "round";
+  
   switch (data.shape) {
     case "pen":
       cxt.beginPath();
@@ -209,7 +212,7 @@ function draw_canvas(data) {
     case "line":
       if ($("#layer" + data.userid).get(0) !== undefined) {
         $("#layer" + data.userid).get(0).getContext('2d')
-            .clearRect(0, 0, 800, 600); // clear the users canvas
+            .clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear the users canvas
       }
       cxt.beginPath();
       cxt.moveTo(data.start[0], data.start[1]);
@@ -220,7 +223,7 @@ function draw_canvas(data) {
     case "rect":
       if ($("#layer" + data.userid).get(0) !== undefined) {
         $("#layer" + data.userid).get(0).getContext('2d')
-            .clearRect(0, 0, 800, 600); // clear the users canvas
+            .clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear the users canvas
       }
       if (data.fill) {
         cxt.fillRect(data.start[0], data.start[1], data.end[0] - data.start[0], data.end[1] - data.start[1]);
@@ -230,7 +233,7 @@ function draw_canvas(data) {
     case "ellipse":
       if ($("#layer" + data.userid).get(0) !== undefined) {
         $("#layer" + data.userid).get(0).getContext('2d')
-            .clearRect(0, 0, 800, 600); // clear the users canvas
+            .clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear the users canvas
       }
       draw_ellipse(cxt, data.start[0], data.start[1], 
           data.end[0] - data.start[0], data.end[1] - data.start[1], data.fill);
@@ -244,7 +247,7 @@ function draw_canvas(data) {
       cxt.closePath();
       break;
   }
-  // draw the username at the end of the line segment
+  // draw the cursor at the end of the line segment
   if (data.username != username_g) {
     var x = data.end[0];
     var y = data.end[1];
@@ -261,9 +264,10 @@ function draw_canvas(data) {
     cxt.stroke();
     cxt.fill();
   }
-  userbufs[data.username] = [x, y];
+  userbufs[data.username] = [x, y]; // remember the position
 }
 
+// display a new piece of msg on the chat box
 function chat_received(data) {
   var username = "<p class=\"chat_name\"><font color=" + data.color + ">" + data.username + "</font></p>";
   var time = "<p class=\"chat_time\">" + data.time + "</p>";
@@ -271,7 +275,7 @@ function chat_received(data) {
   var chat_entry = "<div class=\"chat_entry\">" + username + time + content + "</div>";
 
   $("#message_box").append(chat_entry);
-  $("#message_box").get(0).scrollTop = $("#message_box").get(0).scrollHeight;
+  $("#message_box").get(0).scrollTop = $("#message_box").get(0).scrollHeight; // scroll the chat box
 }
 
 function canvas_mousedown(e) {
@@ -420,6 +424,7 @@ function canvas_mousemove(e) {
   }
 }
 
+// when the mouse is move onto the canvas
 function canvas_mouseover(e) {
   if (mousedown) {
     drawing = 1;
@@ -432,6 +437,7 @@ function canvas_mouseover(e) {
   }
 }
 
+// when the mouse is move out of the canvas
 function canvas_mouseout(e) {
   drawing = 0;
   last_x = -1;
@@ -477,11 +483,11 @@ function send_chat() {
 function login() {
   var set_name = function() {
     var name = $("#name_input").val();
-    if (name != '' && name.length <= 16) {
-      $("#name_dialog").dialog("close");
+    if (name != '' && name.length <= 16) { // must be not null and less that 16 chars
+      $("#name_dialog").dialog("close"); // close the dialog
       username_g = name;
       $("#username").text(name);
-      init_socket();
+      init_socket(); // start the websocket
       user_login(name);
     }
   };
@@ -505,6 +511,7 @@ function login() {
   show_dialog();
 }
 
+// when the webpage is loaded
 $(document).ready(function() {
   login();
   init_ui();

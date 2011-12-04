@@ -1,3 +1,21 @@
+/**
+ * This file contains the functions and variables to help the main functionalities
+ */
+
+// used for setting the refreshing frequency
+function time_out() {
+  timeout = true;
+}
+
+// initialize the detector canvas by adding the event listeners
+function init_detector() {
+  $("#detector").mousedown(canvas_mousedown);
+  $("#detector").mouseup(canvas_mouseup);
+  $("#detector").mousemove(canvas_mousemove);
+  $("#detector").mouseover(canvas_mouseover);
+  $("#detector").mouseout(canvas_mouseout);
+}
+
 // make a url to the canvas to enable downloading
 function make_url() {
   $("<canvas id=\"save_canvas\" width=\"800\" height=\"600\"></canvas>").insertBefore($("#canvas"));
@@ -17,6 +35,7 @@ function make_url() {
   $("#save_canvas").remove();
 }
 
+// clear the cursor(pen cap)
 function clear_usercap(username) {
   if (userbufs[username]) {
     console.log(userbufs[username][0] + " " + userbufs[username][1]);
@@ -25,6 +44,7 @@ function clear_usercap(username) {
       .clearRect(userbufs[username][0] - 10, userbufs[username][1] - 10, 20, 20); // clear the detector canvas
 }
 
+// draw an ellipse with the specified coordinates and "fill"
 function draw_ellipse(ctx, x, y, w, h, fill) {
   var kappa = .5522848;
   ox = (w / 2) * kappa, // control point offset horizontal
