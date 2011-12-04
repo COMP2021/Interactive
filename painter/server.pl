@@ -122,7 +122,7 @@ sub exec_draw_req {
     tentative => $tttv,
     usercolor => $usercolor
   });
-  if ($shape eq "pen") {
+  if ($shape eq "pen" or $shape eq "eraser") {
     append_to_buffer($userid, $data);
   } else {
     set_buffer($userid, $data);

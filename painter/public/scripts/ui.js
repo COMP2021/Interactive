@@ -335,5 +335,5 @@ function init_ui() {
 
   init_tools();
 
-  $(document).click(page_clicked);
+  $(document).mousedown(page_clicked);
 }

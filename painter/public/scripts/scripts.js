@@ -177,6 +177,28 @@ function move_canvas_to_top(canvas_id) {
   $("#layer" + canvas_id).insertBefore($("#detector"));
 }
 
+function draw_ellipse(ctx, x, y, w, h, fill) {
+  var kappa = .5522848;
+  ox = (w / 2) * kappa, // control point offset horizontal
+  oy = (h / 2) * kappa, // control point offset vertical
+  xe = x + w,           // x-end
+  ye = y + h,           // y-end
+  xm = x + w / 2,       // x-middle
+  ym = y + h / 2;       // y-middle
+
+  ctx.beginPath();
+  ctx.moveTo(x, ym);
+  ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+  ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+  ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+  ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  ctx.stroke();
+}
+
 function draw_canvas(data) {
   var cxt;
   if (data.tentative) { // draw the the layers above
@@ -232,8 +254,16 @@ function draw_canvas(data) {
         $("#layer" + data.userid).get(0).getContext('2d')
             .clearRect(0, 0, 800, 600); // clear the users canvas
       }
+      draw_ellipse(cxt, data.start[0], data.start[1], 
+          data.end[0] - data.start[0], data.end[1] - data.start[1], data.fill);
       break;
     case "eraser":
+      cxt.strokeStyle = bgcolor;
+      cxt.beginPath();
+      cxt.moveTo(data.start[0], data.start[1]);
+      cxt.lineTo(data.end[0], data.end[1]);
+      cxt.stroke();
+      cxt.closePath();
       break;
   }
   // draw the username at the end of the line segment
@@ -367,8 +397,48 @@ function canvas_mousemove(e) {
           }
           break;
         case "ellipse":
+          if (last_x == -1 && last_y == -1) {
+            last_x = x_pos;
+            last_y = y_pos;
+          } else {
+            var action = {
+              action: "draw",
+              userid: userid_g,
+              shape: "ellipse",
+              start: [last_x, last_y],
+              end: [x_pos, y_pos],
+              fg: currfg_g,
+              bg: currbg_g,
+              width: currwidth_g,
+              fill: currfill_g,
+              tentative: 1,
+              usercolor: usercolor_g
+            };
+            ws.send(JSON.stringify(action));
+          }
           break;
         case "eraser":
+          if (last_x == -1 && last_y == -1) {
+            last_x = x_pos;
+            last_y = y_pos;
+          } else {
+            var action = {
+              action: "draw",
+              userid: userid_g,
+              shape: "eraser",
+              start: [last_x, last_y],
+              end: [x_pos, y_pos],
+              fg: currfg_g,
+              bg: currbg_g,
+              width: currwidth_g,
+              fill: currfill_g,
+              tentative: 1,
+              usercolor: usercolor_g
+            };
+            ws.send(JSON.stringify(action));
+            last_x = x_pos;
+            last_y = y_pos;
+          }
           break;
       }
     }
