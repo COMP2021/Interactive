@@ -10,6 +10,7 @@
     <link type="text/css" rel="stylesheet" href="/scripts/jquery-miniColors/jquery.miniColors.css" />
     <script src="/scripts/ui.js"></script>
     <script src="/scripts/scripts.js"></script>
+    <script src="/scripts/utils.js"></script>
     <style type="text/css">
       body {
         background:#EEE;

@@ -143,22 +143,16 @@ function init_detector() {
   $("#detector").mouseout(canvas_mouseout);
 }
 
-// check whether a user has logged in before or not
-function is_new_user(username) {
-  for (var i = 0; i < usernames.length; i++) {
-    if (usernames[i] == username) {
-      return false;
-    }
-  }
-  return true;
-}
-
 // add a user to the online user display when a new user is in
 function user_login(username) {
   if (is_new_user(username)) { // a new user that never logged in before
     usernames.push(username); // store the username in the array
     var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
-    $("#online_user").append(user_entry);
+    if ($("#user_" + username_g).length == 0) {
+      $("#online_user").append(user_entry);
+    } else {
+      $(user_entry).insertAfter($("#user_" + username_g));
+    }
   } else { // a user that have logged in
     $("#user_" + username + " p").css("color", "#000");
     $("#user_" + username).insertAfter($("#user_" + username_g));
@@ -181,28 +175,6 @@ function add_canvas(canvas_id) {
 
 function move_canvas_to_top(canvas_id) {
   $("#layer" + canvas_id).insertBefore($("#detector"));
-}
-
-function draw_ellipse(ctx, x, y, w, h, fill) {
-  var kappa = .5522848;
-  ox = (w / 2) * kappa, // control point offset horizontal
-  oy = (h / 2) * kappa, // control point offset vertical
-  xe = x + w,           // x-end
-  ye = y + h,           // y-end
-  xm = x + w / 2,       // x-middle
-  ym = y + h / 2;       // y-middle
-
-  ctx.beginPath();
-  ctx.moveTo(x, ym);
-  ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-  ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-  ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-  ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-  ctx.closePath();
-  if (fill) {
-    ctx.fill();
-  }
-  ctx.stroke();
 }
 
 function draw_canvas(data) {
@@ -290,12 +262,6 @@ function draw_canvas(data) {
     cxt.fill();
   }
   userbufs[data.username] = [x, y];
-}
-
-function clear_usercap(username) {
-  console.log(userbufs[username]);
-  $("#detector").get(0).getContext('2d')
-      .clearRect(userbufs[username][0] - 10, userbufs[username][1] - 10, 20, 20); // clear the detector canvas
 }
 
 function chat_received(data) {
@@ -537,25 +503,6 @@ function login() {
     $(".ui-dialog-titlebar").hide(); // hide the title bar
   };
   show_dialog();
-}
-
-// make a url to the canvas to enable downloading
-function make_url() {
-  $("<canvas id=\"save_canvas\" width=\"800\" height=\"600\"></canvas>").insertBefore($("#canvas"));
-  var ctx = $("#save_canvas").get(0).getContext('2d');
-
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0, 0, 800, 600); // fill the background with white
-  ctx.drawImage($("#canvas").get(0), 0, 0);
-  for (var i = 0; i < $(".layer").length; i++) {
-    ctx.drawImage($("#layer" + i).get(0), 0, 0);
-  }
-
-  $("#save_canvas").hide(); // make it invisible since we don't need it displayed
-  var url = $("#save_canvas").get(0).toDataURL();
-
-  window.open(url); // open a tab for the image
-  $("#save_canvas").remove();
 }
 
 $(document).ready(function() {

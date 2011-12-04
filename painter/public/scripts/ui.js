@@ -228,12 +228,10 @@ function width_out(){
 
 function width_dialog_over() {
   width_div_over = true;
-  console.log(width_div_over);
 }
 
 function width_dialog_out() {
   width_div_over = false;
-  console.log(width_div_over);
 }
 
 function width_clicked(){
@@ -288,11 +286,21 @@ function chat_out() {
 }
 
 function user_over() {
-  $(this).css("background", "#EEE");
+  var id = $(this).attr("id");
+  var regex = /user\_(.*)/;
+  var username = id.match(regex)[1];
+  if (!shine_username_hash[username]) {
+    $(this).css("background", "#EEE");
+  }
 }
 
 function user_out() {
-  $(this).css("background", "#FFF");
+  var id = $(this).attr("id");
+  var regex = /user\_(.*)/;
+  var username = id.match(regex)[1];
+  if (!shine_username_hash[username]) {
+    $(this).css("background", "#FFF");
+  }
 }
 
 function talk_area_pressed(e) {
@@ -342,6 +350,7 @@ function stop_username_shine(username) {
     var id = shine_username_hash[username]; // get the id
     clearInterval(id); // stop shining
     $("#user_" + username).css("background-color", "#FFFFFF"); // restore background color
+    shine_username_hash[username] = 0;
   }
 }
 
@@ -411,8 +420,8 @@ function init_ui() {
   $(".chat_entry").live("mouseover", chat_over);
   $(".chat_entry").live("mouseout", chat_out);
 
-  $(".user_entry").live("mouseover", chat_over);
-  $(".user_entry").live("mouseout", chat_out);
+  $(".user_entry").live("mouseover", user_over);
+  $(".user_entry").live("mouseout", user_out);
 
   $("#coming_soon").hide();
   $("#username_in_use").hide();
