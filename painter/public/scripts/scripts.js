@@ -17,16 +17,6 @@ var undoed = 0;
 
 var timeout = true; // if true, then we can detect mouse moves, used to prevent too much data transfer
 
-// colors for username display
-var color_arr = [
-  "#ffdab9", // peach puff
-  "#87cefa", // light sky blue
-  "#adff2f", // green yellow
-  "#ffd700", // gold
-  "#ff6347", // tomato
-  "#ee82ee", // violet
-];
-
 // used to store all the users that have logged in
 var usernames = [];
 
@@ -53,7 +43,7 @@ function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
   setInterval(clear_username, 500); // clear the usernames on the detector canvas every 0.5 s
 
-  ws = new WebSocket('ws://175.159.124.247:3389/server');
+  ws = new WebSocket('ws://localhost:3389/server');
 
   ws.onopen = function() {
     var action = { // new a user
@@ -70,8 +60,24 @@ function init_socket() {
     switch (action) {
       case "new_user":
         if (!data.permission) {
-          alert("username already in use");
-          login();
+          // not permitted, display an error message
+          var dialogOpts = { // options
+            buttons: {
+              "Ok": function() {
+                $("#username_in_use").dialog("close");
+                login();
+              }
+            }
+          };
+          $("#username_in_use").dialog(
+            dialogOpts,
+            {
+              modal: true,
+              resizable: false,
+            }
+          );
+          // hide the title bar
+          $(".ui-dialog-titlebar").hide(); // hide the title bar
         }
         init_detector();
         userid_g = data.userid; // assign an id to the user
@@ -169,7 +175,7 @@ function user_logout(username) {
 }
 
 function add_canvas(canvas_id) {
-  $("<canvas id=\"layer" + canvas_id + "\" width=\"800\"height=\"600\"></canvas>")
+  $("<canvas id=\"layer" + canvas_id + "\" class=\"layer\" width=\"800\" height=\"600\"></canvas>")
       .insertAfter($("#canvas"));
 }
 
@@ -267,6 +273,7 @@ function draw_canvas(data) {
       break;
   }
   // draw the username at the end of the line segment
+  /*
   if (data.username != username_g) {
     var name_len = data.username.length;
     var rect_len = 16 + name_len * 6;
@@ -279,6 +286,7 @@ function draw_canvas(data) {
     cxt.strokeRect(x + 2, y + 2, rect_len, 15);
     cxt.fillText(data.username, x + 10, y + 12);
   }
+  */
 
   //buf_x = x;
   //buf_y = y;
@@ -290,7 +298,6 @@ function clear_username() {
 }
 
 function chat_received(data) {
-  console.log(data.color);
   var username = "<p class=\"chat_name\"><font color=" + data.color + ">" + data.username + "</font></p>";
   var time = "<p class=\"chat_time\">" + data.time + "</p>";
   var content = "<p class=\"chat_content\">" + data.content + "</p>";
@@ -531,8 +538,23 @@ function login() {
   show_dialog();
 }
 
+// make a url to the canvas to enable downloading
 function make_url() {
-  var url = $("#canvas").get(0).toDataURL();
+  $("<canvas id=\"save_canvas\" width=\"800\" height=\"600\"></canvas>").insertBefore($("#canvas"));
+  var ctx = $("#save_canvas").get(0).getContext('2d');
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, 800, 600); // fill the background with white
+  ctx.drawImage($("#canvas").get(0), 0, 0);
+  for (var i = 0; i < $(".layer").length; i++) {
+    ctx.drawImage($("#layer" + i).get(0), 0, 0);
+  }
+
+  $("#save_canvas").hide(); // make it invisible since we don't need it displayed
+  var url = $("#save_canvas").get(0).toDataURL();
+
+  window.open(url); // open a tab for the image
+  $("#save_canvas").remove();
 }
 
 $(document).ready(function() {

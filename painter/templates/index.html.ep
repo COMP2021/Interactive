@@ -12,7 +12,7 @@
     <script src="/scripts/scripts.js"></script>
     <style type="text/css">
       body {
-        background-color:#EEE;
+        background:#EEE;
       }
       #container {
         position:absolute;
@@ -111,11 +111,23 @@
         overflow-x:hidden;
         background-color:#FFF;
         margin-bottom:10px;
+        border-radius: 10px;
+        border-radius: 10px;
       }
       #online_user p {
         display:inline;
         font-family:Arial;
         padding:5px 5px 5px 5px;
+      }
+      #user_title {
+        height:14px;
+        width:126px;
+        border-bottom:1px solid #AAA;
+        padding:2px;
+        font-family:Arial;
+        font-size:12px;
+        color:#AAA;
+        text-align:center;
       }
       canvas {
         position:absolute;
@@ -140,7 +152,7 @@
       #talk_area {
         position:absolute;
         left:970px;
-        top:620px;
+        top:611px;
         width:296px;
         height:100px;
         border:1px solid #AAA;
@@ -209,6 +221,7 @@
       }
       .chat_entry {
         padding: 5px 10px 5px 10px;
+        font-style:italic;
       }
       .chat_name {
         display:inline;
@@ -230,12 +243,16 @@
   </head>
   <body>
     <div id="container">
+
+      <!-- the top bar including the username display -->
       <div id="top_bar">
         <p id="username">Please Login</p>
         <div id="setting">
           <img id="setting_img" src="/images/setting.png"/>
         </div>
       </div>
+
+      <!-- title bar -->
       <div id="title_bar">
         <div id="title_text">
           <p id="inter_cav" class="inline">Interactive Canvas</p>
@@ -245,6 +262,8 @@
           <p id="comment">A demo of the exciting features of HTML5 canvas and WebSocket.</p>
         </div>
       </div>
+
+      <!-- toolbar -->
       <div id="tool_bar">
         <ul id="tools">
           <li id="tool_pen">Pen</li>
@@ -260,30 +279,57 @@
           <li id="tool_fill">Fill</li>
         </ul>
       </div>
+
+      <!-- display the width slider dialog -->
       <div id="width_div">
         <input id="width_slider" type="range" value="1" min="1" max="100"/>
         <p id="width_display">1</p>
       </div>
-      <div id="online_user"></div>
+
+      <!-- display the users online -->
+      <div id="online_user">
+        <div id="user_title">Users</div>
+      </div>
+
+      <!-- the canvas part -->
       <div id="canvas_container">
         <canvas id="canvas" width="800" height="600"></canvas>
         <canvas id="detector" width="800" height="600"></canvas>
       </div>
+
+      <!-- chatting part -->
       <div id="message_box"></div>
       <textarea id="talk_area"></textarea>
       <div id="send_btn">Send (Ctrl + Enter)</div>
+
+      <!-- the bar at the bottom of the page -->
       <div id="bottom_bar">
         <p>
           <a href="https://github.com/COMP2021/Interactive">Source code (Github)</a>
         </p>
       <div>
+
+      <!-- the dialog for entering username -->
       <div id="name_dialog">
         <p>Please put your name here<br />(no more than 16 characters):</p>
         <input id="name_input" type="text"/>
       </div>
+
+      <!-- display a dialog of "coming soon" -->
+      <div id="coming_soon">
+        <p>Comming Soon...</p>
+      </div>
+
+      <!-- display a dialog showing the username is in use -->
+      <div id="username_in_use">
+        <p>Oops... Seems that the name is already used.</p>
+      </div>
+      <!-- the setting menu -->
+      <!--
       <div id="setting_menu">
         <p id="logout" class="inline">Logout</p>
       </div>
+      -->
     </div>
   </body>
 </html>

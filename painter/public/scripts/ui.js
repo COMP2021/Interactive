@@ -1,6 +1,16 @@
 var setting_clked = false;
 var width_div_over = false;
 
+// colors for username display
+var color_arr = [
+  "#ffa500", // orange
+  "#87cefa", // light sky blue
+  "#7cfc00", // lawn green
+  "#daa520", // light goldenrod
+  "#ff6347", // tomato
+  "#ee82ee", // violet
+];
+
 function setting_over() {
   if (!setting_clked) {
     $("#setting").css("background", "#666");
@@ -30,18 +40,47 @@ function setting_clicked() {
   */
 }
 
+function upload_over() {
+  $("#upload").css("color", "#333");
+  $("#upload").css("border-color", "#333");
+}
+
+function upload_out() {
+  $("#upload").css("color", "#666");
+  $("#upload").css("border-color", "#AAA");
+}
+
+function upload_clicked() {
+  var dialogOpts = { // options
+    buttons: {
+      "Ok": function() {
+        $("#coming_soon").dialog("close");
+      }
+    }
+  };
+
+  $("#coming_soon").dialog(
+    dialogOpts,
+    {
+      modal: true,
+      resizable: false,
+    }
+  );
+  $(".ui-dialog-titlebar").hide(); // hide the title bar
+}
+
 function saveas_over() {
   $("#saveas").css("color", "#333");
   $("#saveas").css("border-color", "#333");
 }
 
-function saveas_clicked() {
-  make_url();
-}
-
 function saveas_out() {
   $("#saveas").css("color", "#666");
   $("#saveas").css("border-color", "#AAA");
+}
+
+function saveas_clicked() {
+  make_url();
 }
 
 function pen_over() {
@@ -324,6 +363,9 @@ function init_ui() {
   $("#send_btn").button();
   $("#send_btn").click(send_chat);
 
+  $("#upload_div").hover(upload_over, upload_out);
+  $("#upload_div").mousedown(upload_clicked);
+
   $("#saveas_div").hover(saveas_over, saveas_out);
   $("#saveas_div").mousedown(saveas_clicked);
 
@@ -332,6 +374,14 @@ function init_ui() {
 
   $(".user_entry").live("mouseover", chat_over);
   $(".user_entry").live("mouseout", chat_out);
+
+  $("#coming_soon").hide();
+  $("#username_in_use").hide();
+
+  $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
+      + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
+  $(".chat_content").css("color", "#87CEFA");
+  $(".chat_content").css("font-style", "italic");
 
   init_tools();
 
