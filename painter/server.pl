@@ -12,20 +12,13 @@ our %clients = ();
 # our $workspace_id = 0;
 our $client_cnt = 0;
 
-# forend webpage, load index.html.ep in the __DATA__ part
+# forend webpage, load index.html.ep in the templetes directory
 get '/index' => sub {
   my $self = shift; # $self is the current client
   $self->render(template => 'index'); # render the webpage to the client
 };
 
-# when connected, ask to login and choose workspace 
-sub on_connect {
-}
-
-# when the user leaves
-sub on_finish {
-}
-
+# parse the contents in the database and buffers to get an array of all the line segs
 sub parse_database_and_buffer {
   my @seg_db = get_db();
   my @segs = ();
@@ -47,6 +40,7 @@ sub parse_database_and_buffer {
   return @segs;
 }
 
+# parse a buffer to get an array of the line segs
 sub parse_buffer {
   my $userid = $_[0];
   my @segs = ();

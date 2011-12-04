@@ -1,4 +1,5 @@
 var setting_clked = false;
+var width_div_over = false;
 
 function setting_over() {
   if (!setting_clked) {
@@ -175,15 +176,28 @@ function redo_clicked() {
 function width_over(){
   $("#tool_width").css("color", "#FFF");
   $("#tool_width").css("background", "#CCC");
-
+  width_div_over = true;
 }
+
 function width_out(){
   $("#tool_width").css("color", "#000");
   $("#tool_width").css("background", "#FFF");
+  width_div_over = false;
+}
+
+function width_dialog_over() {
+  width_div_over = true;
+  console.log(width_div_over);
+}
+
+function width_dialog_out() {
+  width_div_over = false;
+  console.log(width_div_over);
 }
 
 function width_clicked(){
-
+  $("#width_div").show();
+  $("#tool_width").css("border", "1px solid #999");
 }
 
 function fill_over(){
@@ -204,6 +218,11 @@ function fill_clicked(){
     currfill_g = 1;
     $("#tool_fill").css("border", "1px solid #999");
   }
+}
+
+function width_changed() {
+  $("#width_display").text($("#width_slider").val());
+  currwidth_g = $("#width_slider").val();
 }
 
 function set_focused(tool) { // set the current tool focused by showing border
@@ -241,6 +260,13 @@ function talk_area_pressed(e) {
   }
 }
 
+function page_clicked() {
+  if (!width_div_over) {
+    $("#width_div").hide();
+    $("#tool_width").css("border", "1px solid #FFF");
+  }
+}
+
 function init_tools() {
   $("#tools").menu();
   $("#fg_name").show().miniColors({
@@ -253,6 +279,9 @@ function init_tools() {
               currbg_g = [rgb.r, rgb.g, rgb.b];
             }});
   $("#bg_name").miniColors('value', '#FFFFFF');
+
+  $("#width_div").hide();
+  $("#width_slider").change(width_changed);
 
   //Add all hover and mousedown function links.
   $("#tool_pen").hover(pen_over, pen_out);
@@ -277,6 +306,8 @@ function init_tools() {
   $("#tool_width").mousedown(width_clicked);
   $("#tool_fill").hover(fill_over, fill_out);
   $("#tool_fill").mousedown(fill_clicked);
+
+  $("#width_div").hover(width_dialog_over, width_dialog_out);
 
   pen_clicked();
 }
@@ -303,4 +334,6 @@ function init_ui() {
   $(".user_entry").live("mouseout", chat_out);
 
   init_tools();
+
+  $(document).click(page_clicked);
 }

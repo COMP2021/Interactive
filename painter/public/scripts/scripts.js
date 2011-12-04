@@ -51,8 +51,9 @@ function time_out() {
 
 function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
+  setInterval(clear_username, 500); // clear the usernames on the detector canvas every 0.5 s
 
-  ws = new WebSocket('ws://localhost:3389/server');
+  ws = new WebSocket('ws://175.159.124.247:3389/server');
 
   ws.onopen = function() {
     var action = { // new a user
@@ -85,19 +86,19 @@ function init_socket() {
           chat_received(jQuery.parseJSON(data.chats[i]));
         }
         for (var i = 0; i < data.allname.length; i++) {
-          add_user_display(data.allname[i]);
+          user_login(data.allname[i]);
         }
         break;
       case "new_canvas":
         if (data.userid != -1) {
           add_canvas(data.userid);
           if (data.username != username_g) {
-            add_user_display(data.username);
+            user_login(data.username);
           }
         }
         break;
       case "user_logout":
-        delete_user_display(data.username);
+        user_logout(data.username);
         break;
       case "draw":
         draw_canvas(data);
@@ -109,8 +110,7 @@ function init_socket() {
         }
         break;
       case "end_seg":
-        $("#detector").get(0).getContext('2d')
-            .clearRect(buf_x - 20, buf_y - 20, 150, 80); // clear the detector canvas
+        clear_username();
         break;
       case "undo":
         $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, 800, 600);
@@ -149,7 +149,7 @@ function is_new_user(username) {
 }
 
 // add a user to the online user display when a new user is in
-function add_user_display(username) {
+function user_login(username) {
   if (is_new_user(username)) { // a new user that never logged in before
     usernames.push(username); // store the username in the array
     var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
@@ -161,7 +161,7 @@ function add_user_display(username) {
 }
 
 // delete a user from the online user display when it logs out
-function delete_user_display(username) {
+function user_logout(username) {
   $("#user_" + username + " p").remove();
   var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
   $("#online_user").append(user_entry); // put the user's name to the last place
@@ -197,6 +197,7 @@ function draw_canvas(data) {
   cxt.strokeStyle = fgcolor;
   cxt.fillStyle = bgcolor;
   cxt.lineWidth = data.width;
+  cxt.lineCap = "round";
   switch (data.shape) {
     case "pen":
       cxt.beginPath();
@@ -244,12 +245,18 @@ function draw_canvas(data) {
 
     cxt = $("#detector").get(0).getContext('2d');
     cxt.strokeStyle = data.usercolor;
-    cxt.clearRect(buf_x - 20, buf_y - 20, 150, 80); // clear the detector canvas
+    cxt.clearRect(0, 0, 800, 600); // clear the detector canvas
     cxt.strokeRect(x + 2, y + 2, rect_len, 15);
     cxt.fillText(data.username, x + 10, y + 12);
   }
-  buf_x = x;
-  buf_y = y;
+
+  //buf_x = x;
+  //buf_y = y;
+}
+
+function clear_username() {
+  $("#detector").get(0).getContext('2d')
+      .clearRect(0, 0, 800, 600); // clear the detector canvas
 }
 
 function chat_received(data) {
@@ -431,7 +438,7 @@ function login() {
       username_g = name;
       $("#username").text(name);
       init_socket();
-      add_user_display(name);
+      user_login(name);
     }
   };
 

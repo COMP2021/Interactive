@@ -86,6 +86,21 @@
         padding-left:30px;
         margin-bottom:30px;
       }
+      #width_div {
+        position:absolute;
+        left:750px;
+        top:163px;
+        z-index:1;
+        padding:10px 10px 0px 10px;
+        background:#FFF;
+        -moz-box-shadow: 0 0 3px 1px #999;
+        -webkit-box-shadow: 0 0 3px 1px #999;
+      }
+      #width_display {
+        text-align:center;
+        color:#AAA;
+        font-family:Arial;
+      }
       #online_user {
         position:absolute;
         left:10px;
@@ -244,6 +259,10 @@
           <li id="tool_width">Width</li>
           <li id="tool_fill">Fill</li>
         </ul>
+      </div>
+      <div id="width_div">
+        <input id="width_slider" type="range" value="1" min="1" max="100"/>
+        <p id="width_display">1</p>
       </div>
       <div id="online_user"></div>
       <div id="canvas_container">
