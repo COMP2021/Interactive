@@ -187,7 +187,7 @@ sub exec_redo_req {
   return $data;
 }
 
-# dealw with chatting
+# deal with chatting
 sub exec_chat_req {
   my ($username, $time, $content, $color) = @_;
   my $json = Mojo::JSON->new;

@@ -3,8 +3,8 @@
 \begin{document}
 \title{Interactive Canvas}
 \subtitle{
-  A demo of the exciting features of HTML5\\
-  canvas and WebSocket
+  A Demo of the Exciting Features of HTML5\\
+  Canvas and WebSocket
 }
 \author{
   GUO Yuxiang\\
@@ -13,100 +13,215 @@
   ZHANG Yusi\\
   ZHAO Guanlun\\
 }
+
 \date{}
 
 \frame{\titlepage} 
 
-\frame{\frametitle{Table of contents}\tableofcontents} 
-
-
-\section{Section no.1} 
-\frame{\frametitle{Title} 
-Each frame should have a title.
-}
-\subsection{Subsection no.1.1  }
-\frame{ 
-Without title somethink is missing. 
+\frame{\frametitle{Before We Start}
+  If you have Chrome or Chromium, please go to \textbf{143.89.218.59:3389/index}.\\
+  After logging in, try whatever you like.\\
 }
 
+\frame{\frametitle{Outline}\tableofcontents} 
 
-\section{Section no. 2} 
-\subsection{Lists I}
-\frame{\frametitle{unnumbered lists}
-\begin{itemize}
-\item Introduction to  \LaTeX  
-\item Course 2 
-\item Termpapers and presentations with \LaTeX 
-\item Beamer class
-\end{itemize} 
+\section{Motivation} 
+\subsection{Why we wanted to create an interactive canvas application}
+\frame{
+  \frametitle{Motivation}
+  You may find it difficult with only e-mail to do the followings\pause\\
+  \begin{itemize}
+  \item
+    \textbf{Discussing}\\
+    Sharing opinions on the architect of a piece of software\pause
+  \item
+    \textbf{Designing}\\
+    Working together on the appearance of a website\pause
+  \item
+    \textbf{Explaining}\\
+    Teaching your friend what is inheritance
+  \end{itemize}
 }
 
-\frame{\frametitle{lists with pause}
-\begin{itemize}
-\item Introduction to  \LaTeX \pause 
-\item Course 2 \pause 
-\item Termpapers and presentations with \LaTeX \pause 
-\item Beamer class
-\end{itemize} 
+\frame{
+  \frametitle{Motivation}
+  Now our Interactive Canvas can help you out\pause
+  \begin{itemize}
+  \item
+    \textbf{Clear}\\
+    Drawing is more straightforward than sending emails\pause
+  \item
+    \textbf{Fast}\\
+    A faster way to express your idea\pause
+  \item
+    \textbf{User-Friendly}\\
+    The user interface is simple but elegant and convenient
+  \end{itemize}
 }
 
-\subsection{Lists II}
-\frame{\frametitle{numbered lists}
-\begin{enumerate}
-\item Introduction to  \LaTeX  
-\item Course 2 
-\item Termpapers and presentations with \LaTeX 
-\item Beamer class
-\end{enumerate}
+\section{Design} 
+\subsection{The structure of the application}
+\frame{
+  \frametitle{Design}
+  A CGI program based on socket and HTML5.
+  \begin{itemize}
+  \item
+    \textbf{Server Side}\\
+    Mojolicious, the Perl web framework
+  \item
+    \textbf{Client Side}\\
+    HTML5 canvas and jQuery
+  \item
+    \textbf{Communication}\\
+    JSON (JavaScript Object Notation)
+  \item
+    \textbf{User Interface}\\
+    HTML with CSS and jQuery UI
+  \end{itemize}
 }
-\frame{\frametitle{numbered lists with pause}
-\begin{enumerate}
-\item Introduction to  \LaTeX \pause 
-\item Course 2 \pause 
-\item Termpapers and presentations with \LaTeX \pause 
-\item Beamer class
-\end{enumerate}
+
+\frame{
+  \frametitle{Design - Server Side}
+  About 500 lines of Perl code.
+  \begin{itemize}
+  \item
+    \textbf{Receiving Messages}\\
+    Receive the messages sent by the clients
+  \item
+    \textbf{Parsing Messages}\\
+    Perform different tasks according to the contents of messages
+  \item
+    \textbf{Database Manipulation}\\
+    A database to store the line segments and chatting messages
+  \item
+    \textbf{Sending Messages Back}\\
+    Send messages to the clients
+  \end{itemize}
 }
 
-\section{Section no.3} 
-\subsection{Tables}
-\frame{\frametitle{Tables}
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Date} & \textbf{Instructor} & \textbf{Title} \\
-\hline
-WS 04/05 & Sascha Frank & First steps with  \LaTeX  \\
-\hline
-SS 05 & Sascha Frank & \LaTeX \ Course serial \\
-\hline
-\end{tabular}}
-
-
-\frame{\frametitle{Tables with pause}
-\begin{tabular}{c c c}
-A & B & C \\ 
-\pause 
-1 & 2 & 3 \\  
-\pause 
-A & B & C \\ 
-\end{tabular} }
-
-
-\section{Section no. 4}
-\subsection{blocs}
-\frame{\frametitle{blocs}
-
-\begin{block}{title of the bloc}
-bloc text
-\end{block}
-
-\begin{exampleblock}{title of the bloc}
-bloc text
-\end{exampleblock}
-
-
-\begin{alertblock}{title of the bloc}
-bloc text
-\end{alertblock}
+\frame{
+  \frametitle{Design - Client Side}
+  About 1,000 lines of Javascript, with the help of jQuery library
+  \begin{itemize}
+  \item
+    \textbf{Initializing Connections}\\
+    Establishing connections with the server
+  \item
+    \textbf{Detecting Event}\\
+    Detecting and responding to mouse events
+  \item
+    \textbf{Sending Messages}\\
+    Send the messages to the server
+  \item
+    \textbf{Receiving Data}\\
+    Getting data from the server and performing correspondingly
+  \item
+    \textbf{Displaying Data}\\
+    Drawing on the canvas and displaying chatting messages
+  \end{itemize}
 }
+
+\frame{
+  \frametitle{Design - Communication}
+  Making use of JSON for data communication
+  \begin{itemize}
+  \item
+    \textbf{Stringifying (Encode)}\\
+    Store the data in an object into a string
+  \item
+    \textbf{Sending through WebSocket}\\
+    Using the WebSocket to send between the server and clients
+  \item
+    \textbf{Parsing String}\\
+    Parse the strings to get the data objects
+  \end{itemize}
+}
+
+\frame{
+  \frametitle{Design - User Interface}
+  More than 300 lines of HTML, CSS and more Javascript to control UI
+  \begin{itemize}
+  \item
+    \textbf{Simple and Elegant}\\
+    GoogleDocs style appearance
+  \item
+    \textbf{jQuery UI}\\
+    Making use of the jQuery UI library
+  \end{itemize}
+}
+
+\section{Highlights}
+
+\frame{
+  \frametitle{Highlights}
+  Some interesting points that worth attention
+  \begin{itemize}
+  \item
+    \textbf{Multiple Canvas}\\
+    Applied for undo and redo
+  \item
+    \textbf{Upload and Download (To Be Implemented)}\\
+    For better user experience
+  \end{itemize}
+}
+
+\subsection{Multiple Canvas}
+\frame{
+  \frametitle{Highlights - Multiple Canvas}
+  Undo and Redo, requires three types of canvas for different tasks\pause
+  \begin{itemize}
+  \item
+    \textbf{Base Canvas}\\
+    For drawing the "static" segments\pause
+  \item
+    \textbf{User's Layers}\\
+    For drawing the tentative segments\pause
+  \item
+    \textbf{Detector}\\
+    Detecting the mouse events\pause
+  \end{itemize}
+  Arrangement of layers need to be changed frequently\pause
+  \begin{itemize}
+  \item
+    \textbf{User Logging In and Out}\\
+    Inserting and deleting canvases\pause
+  \item
+    \textbf{Drawing}\\
+    Rearranging the order of canvases
+  \end{itemize}
+}
+
+\subsection{Upload and Download}
+\frame{
+  \frametitle{Highlights - Upload and Download}
+  This can make the application more practical
+  \begin{itemize}
+  \item
+    \textbf{Download}\\
+    Make a copy of the canvas
+  \item
+    \textbf{Upload}\\
+    Increase usability, not yet implemented
+  \end{itemize}
+}
+
+\section{Further Development}
+
+\subsection{What we are going to do in the future}
+\frame{
+  \frametitle{Further Development}
+  What to add to the application
+  \begin{itemize}
+  \item
+    \textbf{Get A Server}
+    Buy some space for this application
+  \item
+    \textbf{Signing Up and Workspace}
+    Workspace of yourself to save you own work
+  \item
+    \textbf{Sharing}
+    Share the files with others
+  \end{itemize}
+}
+
 \end{document}

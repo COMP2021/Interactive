@@ -37,9 +37,6 @@ function make_url() {
 
 // clear the cursor(pen cap)
 function clear_usercap(username) {
-  if (userbufs[username]) {
-    console.log(userbufs[username][0] + " " + userbufs[username][1]);
-  }
   $("#detector").get(0).getContext('2d')
       .clearRect(userbufs[username][0] - 10, userbufs[username][1] - 10, 20, 20); // clear the detector canvas
 }

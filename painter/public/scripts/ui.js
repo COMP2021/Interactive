@@ -453,12 +453,6 @@ function init_ui() {
   $("#coming_soon").hide();
   $("#username_in_use").hide();
 
-  // add a welcome message to the chatting area
-  $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
-      + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
-  $(".chat_content").css("color", "#87CEFA");
-  $(".chat_content").css("font-style", "italic");
-
   init_tools();
 
   // also used for the width dialog

@@ -46,7 +46,7 @@ WebSocket.__initialize; // initialize the websocket
 function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
 
-  ws = new WebSocket('ws://143.89.167.149:3389/server');
+  ws = new WebSocket('ws://143.89.218.59:3389/server');
 
   // when the websocket is opened
   ws.onopen = function() {
@@ -85,6 +85,13 @@ function init_socket() {
         init_detector(); // initialize the "detector" canvas to detect mouse events
         userid_g = data.userid; // assign an id to the user
         usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed after it
+
+        // add a welcome message to the chatting area
+        $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
+            + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
+        $(".chat_content").css("color", "#87CEFA");
+        $(".chat_content").css("font-style", "italic");
+
         for (var i = 0; i < data.allid.length; i++) {
           add_canvas(data.allid[i]); // add the existing canvases
         }
@@ -140,7 +147,7 @@ function init_socket() {
   };
 }
 
-// add a user to the online user display when a new user is in
+// add a user to the online user display when a new user is in and add a message to the chat box
 function user_login(username) {
   if (is_new_user(username)) { // a new user that never logged in before
     usernames.push(username); // store the username in the array
