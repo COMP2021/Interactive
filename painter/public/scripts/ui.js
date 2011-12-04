@@ -1,6 +1,8 @@
 var setting_clked = false;
 var width_div_over = false;
 
+var shine_username_hash = {};
+
 // colors for username display
 var color_arr = [
   "#ffa500", // orange
@@ -303,6 +305,43 @@ function page_clicked() {
   if (!width_div_over) {
     $("#width_div").hide();
     $("#tool_width").css("border", "1px solid #FFF");
+  }
+}
+
+function username_shine(username, color) {
+  if (username != username_g) { // do not shine the user's name
+    $("#user_" + username).css("background-color", color);
+    var alpha = 0.4;
+    var alpha_incr = true;
+    var shine = function() {
+      if (alpha_incr) { // increase the alpha
+        alpha += 0.1;
+        if (alpha >= 1.0) {
+          alpha_incr = false;
+        }
+      } else { // decrease the alpha
+        alpha -= 0.1;
+        if (alpha <= 0.4) {
+          alpha_incr = true;
+        }
+      }
+      var bgcolor = $("#user_" + username).css("background-color");
+      var regex = /([0-9]+).*?([0-9]+).*?([0-9]+)/;
+      var rgb = bgcolor.match(regex); // convert the rgb string to an array
+
+      $("#user_" + username).css("background-color", 
+          "rgba(" + rgb[1] + ", " + rgb[2] + ", " + rgb[3] + ", " + alpha + ")"); // change the alpha
+    };
+    var id = setInterval(shine, 50);
+    shine_username_hash[username] = id; // push to the hashtable for stopping
+  }
+}
+
+function stop_username_shine(username) {
+  if (username != username_g) {
+    var id = shine_username_hash[username]; // get the id
+    clearInterval(id); // stop shining
+    $("#user_" + username).css("background-color", "#FFFFFF"); // restore background color
   }
 }
 

@@ -145,6 +145,7 @@ sub exec_beginseg_req {
   my $data = $json->encode( {
     action => "begin_seg",
     userid => $userid,
+    username => $clients{$userid}->get_cname(),
     undoed => $undoed,
     segs => \@segs_to_base
   });
@@ -156,7 +157,8 @@ sub exec_endseg_req {
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "end_seg",
-    userid => $userid
+    userid => $userid,
+    username => $clients{$userid}->get_cname()
   });
   return $data;
 }

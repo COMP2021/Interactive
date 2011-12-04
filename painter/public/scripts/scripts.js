@@ -20,6 +20,8 @@ var timeout = true; // if true, then we can detect mouse moves, used to prevent 
 // used to store all the users that have logged in
 var usernames = [];
 
+var userbufs = {};
+
 // Following are the global variables describing the user's current state,
 // when changing the properties using the toolbar or others, just update
 // these variables
@@ -41,9 +43,7 @@ function time_out() {
 
 function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
-  setInterval(clear_username, 500); // clear the usernames on the detector canvas every 0.5 s
-
-  ws = new WebSocket('ws://localhost:3389/server');
+  ws = new WebSocket('ws://143.89.231.37:3389/server');
 
   ws.onopen = function() {
     var action = { // new a user
@@ -111,12 +111,14 @@ function init_socket() {
         break;
       case "begin_seg":
         move_canvas_to_top(data.userid);
+        username_shine(data.username, color_arr[data.userid]);
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
         }
         break;
       case "end_seg":
-        clear_username();
+        stop_username_shine(data.username);
+        clear_usercap(data.username);
         break;
       case "undo":
         $("#layer" + data.userid).get(0).getContext('2d').clearRect(0, 0, 800, 600);
@@ -130,9 +132,6 @@ function init_socket() {
         chat_received(data);
         break;
     }
-  };
-
-  ws.onclose = function() { // when socket is closed, do nothing now
   };
 }
 
@@ -172,6 +171,7 @@ function user_logout(username) {
   var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
   $("#online_user").append(user_entry); // put the user's name to the last place
   $("#user_" + username + " p").css("color", "#CCC");
+  clear_usercap(username);
 }
 
 function add_canvas(canvas_id) {
@@ -273,28 +273,29 @@ function draw_canvas(data) {
       break;
   }
   // draw the username at the end of the line segment
-  /*
   if (data.username != username_g) {
-    var name_len = data.username.length;
-    var rect_len = 16 + name_len * 6;
     var x = data.end[0];
     var y = data.end[1];
 
     cxt = $("#detector").get(0).getContext('2d');
     cxt.strokeStyle = data.usercolor;
-    cxt.clearRect(0, 0, 800, 600); // clear the detector canvas
-    cxt.strokeRect(x + 2, y + 2, rect_len, 15);
-    cxt.fillText(data.username, x + 10, y + 12);
+    cxt.fillStyle = data.usercolor;
+    if (userbufs[data.username]) {
+      cxt.clearRect(userbufs[data.username][0] - 10, 
+          userbufs[data.username][1] - 10, 20, 20); // clear the detector canvas
+    }
+    cxt.beginPath();
+    cxt.arc(x, y, 5, 0, 2 * Math.PI, false);
+    cxt.stroke();
+    cxt.fill();
   }
-  */
-
-  //buf_x = x;
-  //buf_y = y;
+  userbufs[data.username] = [x, y];
 }
 
-function clear_username() {
+function clear_usercap(username) {
+  console.log(userbufs[username]);
   $("#detector").get(0).getContext('2d')
-      .clearRect(0, 0, 800, 600); // clear the detector canvas
+      .clearRect(userbufs[username][0] - 10, userbufs[username][1] - 10, 20, 20); // clear the detector canvas
 }
 
 function chat_received(data) {
@@ -309,7 +310,7 @@ function chat_received(data) {
 
 function canvas_mousedown(e) {
   mousedown = 1;
-  drawing = 1;
+  drawing = 1; // restore background color
   var action = {
     action: "begin_seg",
     userid: userid_g,
