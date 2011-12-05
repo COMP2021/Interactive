@@ -4,6 +4,7 @@
  */
 var setting_clked = false;
 var width_div_over = false;
+var setting_div_over = false;
 
 // a hashtable used to help shine or stop shining the usernames
 var shine_username_hash = {};
@@ -18,33 +19,54 @@ var color_arr = [
   "#ee82ee", // violet
 ];
 
+// setting icon mouse over
 function setting_over() {
   if (!setting_clked) {
-    $("#setting").css("background", "#666");
+    $("#setting").css("background-color", "rgba(255, 255, 255, 0.3)");
+  } else {
+    setting_div_over = true;
   }
 }
 
+// setting icon mouse out
 function setting_out() {
   if (!setting_clked) {
-    $("#setting").css("background", "#333");
+    $("#setting").css("background-color", "rgba(255, 255, 255, 0)");
     $("#setting_img").attr("src", "/images/setting.png");
+  } else {
+    setting_div_over = false;
   }
 }
 
+// setting icon mouse clicked
 function setting_clicked() {
-  /*
-  if (setting_clked) {
-    setting_clked = false;
-  } else {
-    setting_clked = true;
-  }
+  setting_clked = true;
+  setting_div_over = true;
   $("#setting_img").attr("src", "/images/setting_clicked.png");
   $("#setting").css("background", "#FFF");
-  var left = $("#setting").position().left;
-  $("#setting_menu").css("top", 24);
-  $("#setting_menu").css("left", left - 60);
+  $("#setting_menu").css("top", 26);
+  $("#setting_menu").css("left", $("#setting").position().left - 130);
   $("#setting_menu").show();
-  */
+  $("#change_theme").hover(change_theme_over, change_theme_out);
+  $("#change_theme").click(change_theme_clicked);
+}
+
+// change theme option mouse over
+function change_theme_over() {
+  $("#change_theme").css("background", "#EEE");
+  setting_div_over = true;
+}
+
+// change theme option mouse out
+function change_theme_out() {
+  $("#change_theme").css("background", "#FFF");
+  setting_div_over = false;
+}
+
+// change theme option mouse clicked
+function change_theme_clicked() {
+  $("#setting_menu").hide();
+  show_change_theme_dialog();
 }
 
 function upload_over() {
@@ -328,6 +350,11 @@ function page_clicked() {
     $("#width_div").hide();
     $("#tool_width").css("border", "1px solid #FFF");
   }
+  if (!setting_div_over) {
+    $("#setting_menu").hide();
+    setting_clked = false;
+    setting_out();
+  }
 }
 
 // make the username shine when a user is drawing
@@ -368,6 +395,73 @@ function stop_username_shine(username) {
     $("#user_" + username).css("background-color", "#FFFFFF"); // restore background color
     shine_username_hash[username] = 0;
   }
+}
+
+// change the theme of the page
+function change_theme() {
+  switch ($(this).attr("id")) {
+    case "default_theme": // default
+      $("body").css("background", "#EEE");
+      $("#top_bar").css("background-color", "#333");
+      $("#bottom_bar").css("background-color", "#333");
+      break;
+    case "metal_theme": // metal
+      $("body").css("background-image", "url(\"images/metal_theme.jpg\")");
+      $("#top_bar").css("background-color", "#555");
+      $("#bottom_bar").css("background-color", "#555");
+      break;
+    case "flower_theme": // flower
+      $("body").css("background-image", "url(\"images/flower_theme.jpg\")");
+      $("#top_bar").css("background-color", "#FD0");
+      $("#bottom_bar").css("background-color", "#FD0");
+      break;
+    case "flame_theme": // flame
+      $("body").css("background-image", "url(\"images/flame_theme.jpg\")");
+      $("#top_bar").css("background-color", "#F40");
+      $("#bottom_bar").css("background-color", "#F40");
+      break;
+    case "ocean_theme": //ocean
+      $("body").css("background-image", "url(\"images/ocean_theme.jpg\")");
+      $("#top_bar").css("background-color", "#09F");
+      $("#bottom_bar").css("background-color", "#09F");
+      break;
+    case "forest_theme": // forest
+      $("body").css("background-image", "url(\"images/forest_theme.jpg\")");
+      $("#top_bar").css("background-color", "#6F0");
+      $("#bottom_bar").css("background-color", "#6F0");
+      break;
+    case "hkust_theme": // HKUST
+      $("body").css("background-image", "url(\"images/hkust_theme.jpg\")");
+      $("#top_bar").css("background-color", "#F72");
+      $("#bottom_bar").css("background-color", "#F72");
+      break;
+  }
+}
+
+// show the dialog for changing the page theme
+function show_change_theme_dialog() {
+  var dialogOpts = { // options
+    buttons: {
+      "Ok": function() {
+        $("#theme_dialog").dialog("close");
+      }
+    }
+  };
+  $("#theme_dialog").dialog(
+    dialogOpts,
+    {
+      modal: true,
+      resizable: false,
+    }
+  );
+  $(".ui-dialog-titlebar").hide(); // hide the title bar
+  $("#default_theme").change(change_theme);
+  $("#metal_theme").change(change_theme);
+  $("#flower_theme").change(change_theme);
+  $("#flame_theme").change(change_theme);
+  $("#ocean_theme").change(change_theme);
+  $("#forest_theme").change(change_theme);
+  $("#hkust_theme").change(change_theme);
 }
 
 // initialize the toolbar
@@ -419,10 +513,8 @@ function init_tools() {
 }
 
 function init_ui() {
-  // $("#setting_menu").hide();
-  // $("#setting_menu").mouseover(setting_clicked);
-
   // the setting icon on the top-right corner
+  $("#setting_menu").hide();
   $("#setting").hover(setting_over, setting_out);
   $("#setting").mousedown(setting_clicked);
 
@@ -452,6 +544,7 @@ function init_ui() {
   // hide the dialogs
   $("#coming_soon").hide();
   $("#username_in_use").hide();
+  $("#theme_dialog").hide();
 
   init_tools();
 

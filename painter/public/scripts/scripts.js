@@ -46,7 +46,7 @@ WebSocket.__initialize; // initialize the websocket
 function init_socket() {
   setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
 
-  ws = new WebSocket('ws://143.89.218.59:3389/server');
+  ws = new WebSocket('ws://localhost:8080/server');
 
   // when the websocket is opened
   ws.onopen = function() {
