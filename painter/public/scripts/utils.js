@@ -31,7 +31,33 @@ function make_url() {
   $("#save_canvas").hide(); // make it invisible since we don't need it displayed
   var url = $("#save_canvas").get(0).toDataURL();
 
-  window.open(url); // open a tab for the image
+  var save_dialog = "<div id=\"save_dialog\">" 
+      + "<img id=\"img_to_save\" src=\"" + url + "\"/ >"
+      + "<p>Right click and click \"Save Image As\"</p></div>"
+  $("#container").append(save_dialog);
+  $("#save_dialog").hide();
+
+  var dialogOpts = { // options
+    buttons: {
+      "Ok": function() {
+        $("#save_dialog").dialog("close");
+        $("#save_dialog").remove();
+      }
+    }
+  };
+
+  $("#save_dialog").dialog(
+    dialogOpts,
+    {
+      modal: true,
+      resizable: false,
+      width:'auto',
+      position: [200, 0],
+    }
+  );
+  $(".ui-dialog-titlebar").hide(); // hide the title bar
+
+  // window.open(url); // open a tab for the image
   $("#save_canvas").remove();
 }
 
