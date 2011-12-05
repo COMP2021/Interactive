@@ -261,6 +261,20 @@ function redo_clicked() {
   redo();
 }
 
+function clear_over(){
+  $("#tool_clear").css("color", "#FFF");
+  $("#tool_clear").css("background", "#CCC");
+}
+
+function clear_out(){
+  $("#tool_clear").css("color", "#000");
+  $("#tool_clear").css("background", "#FFF");
+}
+
+function clear_clicked() {
+  clear();
+}
+
 function width_over(){
   $("#tool_width").css("color", "#FFF");
   $("#tool_width").css("background", "#CCC");
@@ -564,6 +578,8 @@ function init_tools() {
   $("#tool_undo").mousedown(undo_clicked);
   $("#tool_redo").hover(redo_over, redo_out);
   $("#tool_redo").mousedown(redo_clicked);
+  $("#tool_clear").hover(clear_over, clear_out);
+  $("#tool_clear").mousedown(clear_clicked);
   $("#tool_fg").hover(fgColor_over, fgColor_out);
   $("#tool_fg").mousedown(fgColor_clicked);
   $("#tool_bg").hover(bgColor_over, bgColor_out);

@@ -290,6 +290,7 @@
           <li id="tool_eraser">Eraser</li>
           <li id="tool_undo">Undo</li>
           <li id="tool_redo">Redo</li>
+          <li id="tool_clear">Clear</li>
           <li id="tool_fg">Foreground<input id="fg_name" type="hidden" name="fg_name" value="color" /></li>
           <li id="tool_bg">Background<input id="bg_name" type="hidden" name="bg_name" value="color" /></li>
           <li id="tool_width">Width</li>
@@ -328,7 +329,7 @@
 
       <!-- the dialog for entering username -->
       <div id="name_dialog">
-        <p>Please put your name here<br />(no more than 16 characters):</p>
+        <p>Please put your name here<br />(no more than 16 letters, numbers or underscores):</p>
         <input id="name_input" type="text"/>
       </div>
 

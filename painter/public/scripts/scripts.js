@@ -88,31 +88,32 @@ function init_socket() {
             }
           );
           $(".ui-dialog-titlebar").hide(); // hide the title bar
-        }
-        init_detector(); // initialize the "detector" canvas to detect mouse events
-        userid_g = data.userid; // assign an id to the user
-        usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed after it
+        } else {
+          init_detector(); // initialize the "detector" canvas to detect mouse events
+          userid_g = data.userid; // assign an id to the user
+          usercolor_g = color_arr[userid_g % color_arr.length]; // initialize user's color, fixed after it
 
-        // add a welcome message to the chatting area
-        $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
-            + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
-        $(".chat_content").css("color", "#87CEFA");
-        $(".chat_content").css("font-style", "italic");
+          // add a welcome message to the chatting area
+          $("#message_box").append("<div class=\"chat_entry\"><p class=\"chat_content\">" 
+              + "Welcome to Interactive Canvas.<br />You can chat with other users here.</p></div>");
+          $(".chat_content").css("color", "#87CEFA");
+          $(".chat_content").css("font-style", "italic");
 
-        for (var i = 0; i < data.allid.length; i++) {
-          add_canvas(data.allid[i]); // add the existing canvases
+          for (var i = 0; i < data.allid.length; i++) {
+            add_canvas(data.allid[i]); // add the existing canvases
+          }
+          for (var i = 0; i < data.segs.length; i++) {
+            draw_canvas(jQuery.parseJSON(data.segs[i])); // draw the segments from the server on the canvases
+          }
+          for (var i = 0; i < data.chats.length; i++) {
+            chat_received(jQuery.parseJSON(data.chats[i])); // display the chattings on the chatting area
+          }
+          for (var i = 0; i < data.allname.length; i++) {
+            user_login(data.allname[i]); //display the usernames on the user display area
+          }
+          // clear the detectore canvas
+          $("#detector").get(0).getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         }
-        for (var i = 0; i < data.segs.length; i++) {
-          draw_canvas(jQuery.parseJSON(data.segs[i])); // draw the segments from the server on the canvases
-        }
-        for (var i = 0; i < data.chats.length; i++) {
-          chat_received(jQuery.parseJSON(data.chats[i])); // display the chattings on the chatting area
-        }
-        for (var i = 0; i < data.allname.length; i++) {
-          user_login(data.allname[i]); //display the usernames on the user display area
-        }
-        // clear the detectore canvas
-        $("#detector").get(0).getContext('2d').clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         break;
       case "new_canvas": // add new canvas to the canvas container
         if (data.userid != -1) {
@@ -123,6 +124,7 @@ function init_socket() {
         }
         break;
       case "user_logout": // when the user logs out
+        $("#layer" + data.userid).remove();
         user_logout(data.username);
         break;
       case "draw": // various line segments
@@ -145,6 +147,11 @@ function init_socket() {
       case "redo": // redo
         for (var i = 0; i < data.segs.length; i++) {
           draw_canvas(jQuery.parseJSON(data.segs[i]));
+        }
+        break;
+      case "clear": // clear
+        for (var i = 0; i < $("canvas").length; i++) {
+          $("canvas").get(i).getContext('2d').clearRect(0, 0, 800, 600);
         }
         break;
       case "chat": // received a chatting message
@@ -172,11 +179,10 @@ function user_login(username) {
 
 // delete a user from the online user display when it logs out
 function user_logout(username) {
-  $("#user_" + username + " p").remove();
+  $("#user_" + username).remove();
   var user_entry = "<div id=\"user_" + username + "\" class=\"user_entry\"><p>" + username + "</p></div>";
   $("#online_user").append(user_entry); // put the user's name to the last place
   $("#user_" + username + " p").css("color", "#CCC");
-  clear_usercap(username);
 }
 
 // add a new layer to the canvas container
@@ -206,10 +212,8 @@ function draw_canvas(data) {
     }
   }
   // parse the strings to hex
-  var fgcolor = "#" + data.fg[0].toString(16) + 
-      data.fg[1].toString(16) + data.fg[2].toString(16);
-  var bgcolor = "#" + data.bg[0].toString(16) + 
-      data.bg[1].toString(16) + data.bg[2].toString(16);
+  var fgcolor = rgb2str(data.fg);
+  var bgcolor = rgb2str(data.bg);
   cxt.strokeStyle = fgcolor;
   cxt.fillStyle = bgcolor;
   cxt.lineWidth = data.width;
@@ -453,9 +457,16 @@ function canvas_mouseover(e) {
 
 // when the mouse is move out of the canvas
 function canvas_mouseout(e) {
-  drawing = 0;
-  last_x = -1;
-  last_y = -1;
+  if (mousedown) {
+    drawing = 0;
+    last_x = -1;
+    last_y = -1;
+    var action = {
+      action: "end_seg",
+      userid: userid_g
+    };
+    ws.send(JSON.stringify(action));
+  }
 }
 
 function undo() {
@@ -480,6 +491,14 @@ function redo() {
   }
 }
 
+function clear() {
+  var action = {
+    action: "clear",
+    userid: userid_g
+  }
+  ws.send(JSON.stringify(action));
+}
+
 function send_chat() {
   if ($("#talk_area").val()) {
     var action = {
@@ -497,7 +516,7 @@ function send_chat() {
 function login() {
   var set_name = function() {
     var name = $("#name_input").val();
-    if (name != '' && name.length <= 16) { // must be not null and less that 16 chars
+    if (is_legal_username(name)) { // must be not null and less that 16 chars
       $("#name_dialog").dialog("close"); // close the dialog
       username_g = name;
       $("#username").text(name);

@@ -99,3 +99,37 @@ function is_new_user(username) {
   }
   return true;
 }
+
+// convert decimal RGB array to string
+function rgb2str(rgb) {
+  var r_str = rgb[0].toString(16);
+  if (r_str.length == 1) {
+    r_str = "0" + r_str;
+  }
+  var g_str = rgb[1].toString(16);
+  if (g_str.length == 1) {
+    g_str = "0" + g_str;
+  }
+  var b_str = rgb[2].toString(16);
+  if (b_str.length == 1) {
+    b_str = "0" + b_str;
+  }
+  return "#" + r_str + g_str + b_str;
+}
+
+// checks whether a username is legal
+function is_legal_username(username) {
+  console.log(username);
+  if (username == '') {
+    return false;
+  } else if (username.length > 16) {
+    return false;
+  } else {
+    var regex = /^[0-9A-Za-z_]+$/;
+    if (username.match(regex)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}

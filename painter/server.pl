@@ -187,7 +187,19 @@ sub exec_redo_req {
   return $data;
 }
 
-# deal with chatting
+# deals with clearing the database 
+sub exec_clear_req {
+  my $userid = $_[0];
+  clear_all();
+  my $json = Mojo::JSON->new;
+  my $data = $json->encode( {
+    action => "clear",
+    userid => $userid
+  });
+  return $data;
+}
+
+# deals with chatting
 sub exec_chat_req {
   my ($username, $time, $content, $color) = @_;
   my $json = Mojo::JSON->new;
@@ -251,6 +263,10 @@ sub exec_msg {
     exec_redo_req(
         $data->{"userid"}
     );
+  } elsif ($action eq "clear") { # clear
+    exec_clear_req(
+        $data->{"userid"}
+    );
   } elsif ($action eq "chat") { # chat
     exec_chat_req(
         $data->{"username"},
@@ -280,6 +296,7 @@ sub user_logout {
   my $json = Mojo::JSON->new;
   my $data = $json->encode( {
     action => "user_logout",
+    userid => $client_id,
     username => $username,
   });
   foreach my $id (keys(%clients)) {

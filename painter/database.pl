@@ -70,23 +70,11 @@ sub get_chatdb {
   return @chat_db;
 }
 
-# print the info of the database, for debugging
-sub print_database {
-  foreach my $item (@seg_db) {
-    print "$item\n";
-  }
-}
-
-# print the info of a buffer, for debugging
-sub print_buffer {
-  my $user_id = $_[0];
-  print "$buffers{$user_id}\n";
-}
-
-# print all, for debugging
-sub print_all_buffer {
+# clear everything, including the seg database and the buffers
+sub clear_all {
+  @seg_db = ();
   foreach my $key (keys(%buffers)) {
-    print_buffer($key);
+    $buffers{$key} = "";
   }
 }
 
