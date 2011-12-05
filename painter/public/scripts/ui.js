@@ -45,10 +45,12 @@ function setting_clicked() {
   $("#setting_img").attr("src", "/images/setting_clicked.png");
   $("#setting").css("background", "#FFF");
   $("#setting_menu").css("top", 26);
-  $("#setting_menu").css("left", $("#setting").position().left - 130);
+  $("#setting_menu").css("left", $("#setting").position().left - 112);
   $("#setting_menu").show();
   $("#change_theme").hover(change_theme_over, change_theme_out);
   $("#change_theme").click(change_theme_clicked);
+  $("#data_frequency").hover(data_frequency_over, data_frequency_out);
+  $("#data_frequency").click(data_frequency_clicked);
 }
 
 // change theme option mouse over
@@ -67,6 +69,24 @@ function change_theme_out() {
 function change_theme_clicked() {
   $("#setting_menu").hide();
   show_change_theme_dialog();
+}
+
+// change theme option mouse over
+function data_frequency_over() {
+  $("#data_frequency").css("background", "#EEE");
+  setting_div_over = true;
+}
+
+// change theme option mouse out
+function data_frequency_out() {
+  $("#data_frequency").css("background", "#FFF");
+  setting_div_over = false;
+}
+
+// change theme option mouse clicked
+function data_frequency_clicked() {
+  $("#setting_menu").hide();
+  show_data_frequency_dialog();
 }
 
 function upload_over() {
@@ -427,15 +447,38 @@ function change_theme() {
       break;
     case "forest_theme": // forest
       $("body").css("background-image", "url(\"images/forest_theme.jpg\")");
-      $("#top_bar").css("background-color", "#6F0");
-      $("#bottom_bar").css("background-color", "#6F0");
+      $("#top_bar").css("background-color", "#292");
+      $("#bottom_bar").css("background-color", "#292");
       break;
     case "hkust_theme": // HKUST
       $("body").css("background-image", "url(\"images/hkust_theme.jpg\")");
-      $("#top_bar").css("background-color", "#F72");
-      $("#bottom_bar").css("background-color", "#F72");
+      $("#top_bar").css("background-color", "#B36");
+      $("#bottom_bar").css("background-color", "#B36");
       break;
   }
+}
+
+// change the refreshing frequency
+function change_frequency() {
+  switch($(this).attr("id")) {
+    case "50_rps":
+      var data_frequency = 20;
+      break;
+    case "40_rps":
+      var data_frequency = 25;
+      break;
+    case "30_rps":
+      var data_frequency = 33;
+      break;
+    case "20_rps":
+      var data_frequency = 50;
+      break;
+    case "10_rps":
+      var data_frequency = 100;
+      break;
+  }
+  clearInterval(refresh_id);
+  refresh_id = setInterval(time_out, data_frequency);
 }
 
 // show the dialog for changing the page theme
@@ -462,6 +505,30 @@ function show_change_theme_dialog() {
   $("#ocean_theme").change(change_theme);
   $("#forest_theme").change(change_theme);
   $("#hkust_theme").change(change_theme);
+}
+
+// show the dialog for changing the data frequency
+function show_data_frequency_dialog() {
+  var dialogOpts = { // options
+    buttons: {
+      "Ok": function() {
+        $("#frequency_dialog").dialog("close");
+      }
+    }
+  };
+  $("#frequency_dialog").dialog(
+    dialogOpts,
+    {
+      modal: true,
+      resizable: false,
+    }
+  );
+  $(".ui-dialog-titlebar").hide(); // hide the title bar
+  $("#50_rps").change(change_frequency);
+  $("#40_rps").change(change_frequency);
+  $("#30_rps").change(change_frequency);
+  $("#20_rps").change(change_frequency);
+  $("#10_rps").change(change_frequency);
 }
 
 // initialize the toolbar
@@ -545,6 +612,7 @@ function init_ui() {
   $("#coming_soon").hide();
   $("#username_in_use").hide();
   $("#theme_dialog").hide();
+  $("#frequency_dialog").hide();
 
   init_tools();
 

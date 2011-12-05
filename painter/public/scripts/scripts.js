@@ -3,11 +3,18 @@
  */
 var ws; // global websocket
 
+var data_frequency = 30; // intervals between each refresh
+
+var refresh_id;
+
 var CANVAS_WIDTH = 800;
+
 var CANVAS_HEIGHT = 600;
 
 var drawing = 0; // whether the user is now drawing
+
 var mousedown = 0;  // whether the mouse is pressed
+
 var canvas_inited = 0; // whether the canvas have been initialized
 
 var last_x = -1; // used to store the previous mouse location
@@ -44,7 +51,7 @@ var usercolor_g; // color used to display the user's name
 WebSocket.__initialize; // initialize the websocket
 
 function init_socket() {
-  setInterval(time_out, 30); // allow mouse move detection every 20 milliseconds
+  refresh_id = setInterval(time_out, data_frequency); // allow mouse move detection every 30 milliseconds
 
   ws = new WebSocket('ws://localhost:8080/server');
 

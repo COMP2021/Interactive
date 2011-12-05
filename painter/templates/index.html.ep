@@ -221,7 +221,7 @@
       #setting_menu {
         position:absolute;
         border:1px solid #CCC;
-        width:160px;
+        width:140px;
         background:#FFF;
         font-family:Arial;
         color:#666;
@@ -229,6 +229,12 @@
       #change_theme {
         padding:5px 20px 5px 20px;
         text-align:center;
+        font-size:12px;
+      }
+      #data_frequency {
+        padding:5px 20px 5px 20px;
+        text-align:center;
+        font-size:12px;
       }
       .chat_entry {
         padding: 5px 10px 5px 10px;
@@ -339,6 +345,7 @@
       <!-- the setting menu -->
       <div id="setting_menu">
         <div id="change_theme">Change Theme</div>
+        <div id="data_frequency">Data Frequency</div>
       </div>
       
       <!-- change theme dialog -->
@@ -351,6 +358,16 @@
         <input id="ocean_theme" type="radio" name="theme">Ocean</input><br /><br />
         <input id="forest_theme" type="radio" name="theme">Forest</input><br /><br />
         <input id="hkust_theme" type="radio" name="theme">HKUST</input><br /><br />
+      </div>
+
+      <!-- change data frequency -->
+      <div id="frequency_dialog">
+        <p>Choose a refreshing frequency according to your network speed:</p><br /><br />
+        <input id="50_rps" type="radio" name="frequency">50 (terribly high speed)</input><br /><br />
+        <input id="40_rps" type="radio" name="frequency">40 (high speed)</input><br /><br />
+        <input id="30_rps" type="radio" name="frequency" checked="yes">30 (medium speed)</input><br /><br />
+        <input id="20_rps" type="radio" name="frequency">20 (low speed)</input><br /><br />
+        <input id="10_rps" type="radio" name="frequency">10 (terribly low speed)</input><br /><br />
       </div>
     </div>
   </body>
