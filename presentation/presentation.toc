@@ -1,10 +1,10 @@
 \beamer@endinputifotherversion {3.10pt}
-\beamer@sectionintoc {1}{Motivation}{4}{0}{1}
-\beamer@subsectionintoc {1}{1}{Why we wanted to create an interactive canvas application}{4}{0}{1}
-\beamer@sectionintoc {2}{Design}{12}{0}{2}
-\beamer@subsectionintoc {2}{1}{The structure of the application}{12}{0}{2}
-\beamer@sectionintoc {3}{Highlights}{17}{0}{3}
-\beamer@subsectionintoc {3}{1}{Multiple Canvas}{18}{0}{3}
-\beamer@subsectionintoc {3}{2}{Upload and Download}{25}{0}{3}
-\beamer@sectionintoc {4}{Further Development}{26}{0}{4}
-\beamer@subsectionintoc {4}{1}{What we are going to do in the future}{26}{0}{4}
+\beamer@sectionintoc {1}{Motivation}{3}{0}{1}
+\beamer@subsectionintoc {1}{1}{Why we wanted to create an interactive canvas application}{3}{0}{1}
+\beamer@sectionintoc {2}{Design}{11}{0}{2}
+\beamer@subsectionintoc {2}{1}{The structure of the application}{11}{0}{2}
+\beamer@sectionintoc {3}{Highlights}{16}{0}{3}
+\beamer@subsectionintoc {3}{1}{Multiple Canvas}{17}{0}{3}
+\beamer@subsectionintoc {3}{2}{Upload and Download}{24}{0}{3}
+\beamer@sectionintoc {4}{Further Development}{25}{0}{4}
+\beamer@subsectionintoc {4}{1}{What we are going to do in the future}{25}{0}{4}

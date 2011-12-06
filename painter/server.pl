@@ -7,6 +7,7 @@ use Client;
 
 require "database.pl";
 
+# all the client objects are stored in a hashtable
 our %clients = ();
 
 # our $workspace_id = 0;
@@ -122,14 +123,15 @@ sub exec_draw_req {
     tentative => $tttv,
     usercolor => $usercolor
   });
-  if ($shape eq "pen" or $shape eq "eraser") {
+  if ($shape eq "pen" or $shape eq "eraser") { # drawing consecutively, push every segment into the database
     append_to_buffer($userid, $data);
-  } else {
+  } else { # only push the last segment to the database
     set_buffer($userid, $data);
   }
   return $data;
 }
 
+# when a line segment begins
 sub exec_beginseg_req {
   my ($userid, $undoed) = @_;
   my @segs_to_base = ();
@@ -152,6 +154,7 @@ sub exec_beginseg_req {
   return $data;
 }
 
+# when a line segment ends
 sub exec_endseg_req {
   my $userid = $_[0];
   my $json = Mojo::JSON->new;
@@ -187,7 +190,7 @@ sub exec_redo_req {
   return $data;
 }
 
-# deals with clearing the database 
+# deals with clearing the database
 sub exec_clear_req {
   my $userid = $_[0];
   clear_all();
@@ -217,7 +220,7 @@ sub exec_chat_req {
     content => $content,
     color => $color
   });
-  insert_chatdb($data);
+  insert_chatdb($data); # into the database
   return $data;
 }
 
@@ -228,6 +231,7 @@ sub exec_msg {
   my $json = Mojo::JSON->new;
   my $data = $json->decode($message);
   my $action = $data->{"action"};
+
   if ($action eq "new_user") { # new user request
     return exec_new_user_req(
         $data->{"username"},
@@ -280,7 +284,7 @@ sub exec_msg {
 # send the message to the clients, does not create or modify the message
 sub send_msg_to_all {
   my ($message) = @_;
-  while ((my $id, my $client) = each(%clients)) {
+  while ((my $id, my $client) = each(%clients)) { # all the clients
     $client->get_wsclient()->send_message($message);
   }
 }
@@ -299,8 +303,8 @@ sub user_logout {
     userid => $client_id,
     username => $username,
   });
-  foreach my $id (keys(%clients)) {
-    $clients{$id}->get_wsclient()->send_message($data); # send back msg with no permission
+  foreach my $id (keys(%clients)) { # all the clients
+    $clients{$id}->get_wsclient()->send_message($data);
   }
 }
 

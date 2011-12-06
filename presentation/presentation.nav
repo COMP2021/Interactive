@@ -3,49 +3,47 @@
 \headcommand {\beamer@framepages {1}{1}}
 \headcommand {\slideentry {0}{0}{2}{2/2}{}{0}}
 \headcommand {\beamer@framepages {2}{2}}
-\headcommand {\slideentry {0}{0}{3}{3/3}{}{0}}
-\headcommand {\beamer@framepages {3}{3}}
-\headcommand {\sectionentry {1}{Motivation}{4}{Motivation}{0}}
-\headcommand {\beamer@sectionpages {1}{3}}
-\headcommand {\beamer@subsectionpages {1}{3}}
-\headcommand {\beamer@subsectionentry {0}{1}{1}{4}{Why we wanted to create an interactive canvas application}}\headcommand {\beamer@subsectionpages {4}{3}}
-\headcommand {\slideentry {1}{1}{1}{4/7}{Why we wanted to create an interactive canvas application}{0}}
-\headcommand {\beamer@framepages {4}{7}}
-\headcommand {\slideentry {1}{1}{2}{8/11}{Why we wanted to create an interactive canvas application}{0}}
-\headcommand {\beamer@framepages {8}{11}}
-\headcommand {\sectionentry {2}{Design}{12}{Design}{0}}
-\headcommand {\beamer@sectionpages {4}{11}}
-\headcommand {\beamer@subsectionpages {4}{11}}
-\headcommand {\beamer@subsectionentry {0}{2}{1}{12}{The structure of the application}}\headcommand {\beamer@subsectionpages {12}{11}}
-\headcommand {\slideentry {2}{1}{1}{12/12}{The structure of the application}{0}}
+\headcommand {\sectionentry {1}{Motivation}{3}{Motivation}{0}}
+\headcommand {\beamer@sectionpages {1}{2}}
+\headcommand {\beamer@subsectionpages {1}{2}}
+\headcommand {\beamer@subsectionentry {0}{1}{1}{3}{Why we wanted to create an interactive canvas application}}\headcommand {\beamer@subsectionpages {3}{2}}
+\headcommand {\slideentry {1}{1}{1}{3/6}{Why we wanted to create an interactive canvas application}{0}}
+\headcommand {\beamer@framepages {3}{6}}
+\headcommand {\slideentry {1}{1}{2}{7/10}{Why we wanted to create an interactive canvas application}{0}}
+\headcommand {\beamer@framepages {7}{10}}
+\headcommand {\sectionentry {2}{Design}{11}{Design}{0}}
+\headcommand {\beamer@sectionpages {3}{10}}
+\headcommand {\beamer@subsectionpages {3}{10}}
+\headcommand {\beamer@subsectionentry {0}{2}{1}{11}{The structure of the application}}\headcommand {\beamer@subsectionpages {11}{10}}
+\headcommand {\slideentry {2}{1}{1}{11/11}{The structure of the application}{0}}
+\headcommand {\beamer@framepages {11}{11}}
+\headcommand {\slideentry {2}{1}{2}{12/12}{The structure of the application}{0}}
 \headcommand {\beamer@framepages {12}{12}}
-\headcommand {\slideentry {2}{1}{2}{13/13}{The structure of the application}{0}}
+\headcommand {\slideentry {2}{1}{3}{13/13}{The structure of the application}{0}}
 \headcommand {\beamer@framepages {13}{13}}
-\headcommand {\slideentry {2}{1}{3}{14/14}{The structure of the application}{0}}
+\headcommand {\slideentry {2}{1}{4}{14/14}{The structure of the application}{0}}
 \headcommand {\beamer@framepages {14}{14}}
-\headcommand {\slideentry {2}{1}{4}{15/15}{The structure of the application}{0}}
+\headcommand {\slideentry {2}{1}{5}{15/15}{The structure of the application}{0}}
 \headcommand {\beamer@framepages {15}{15}}
-\headcommand {\slideentry {2}{1}{5}{16/16}{The structure of the application}{0}}
+\headcommand {\sectionentry {3}{Highlights}{16}{Highlights}{0}}
+\headcommand {\beamer@sectionpages {11}{15}}
+\headcommand {\beamer@subsectionpages {11}{15}}
+\headcommand {\slideentry {3}{0}{6}{16/16}{}{0}}
 \headcommand {\beamer@framepages {16}{16}}
-\headcommand {\sectionentry {3}{Highlights}{17}{Highlights}{0}}
-\headcommand {\beamer@sectionpages {12}{16}}
-\headcommand {\beamer@subsectionpages {12}{16}}
-\headcommand {\slideentry {3}{0}{6}{17/17}{}{0}}
-\headcommand {\beamer@framepages {17}{17}}
-\headcommand {\beamer@subsectionentry {0}{3}{1}{18}{Multiple Canvas}}\headcommand {\beamer@subsectionpages {17}{17}}
-\headcommand {\slideentry {3}{1}{1}{18/24}{Multiple Canvas}{0}}
-\headcommand {\beamer@framepages {18}{24}}
-\headcommand {\beamer@subsectionentry {0}{3}{2}{25}{Upload and Download}}\headcommand {\beamer@subsectionpages {18}{24}}
-\headcommand {\slideentry {3}{2}{1}{25/25}{Upload and Download}{0}}
+\headcommand {\beamer@subsectionentry {0}{3}{1}{17}{Multiple Canvas}}\headcommand {\beamer@subsectionpages {16}{16}}
+\headcommand {\slideentry {3}{1}{1}{17/23}{Multiple Canvas}{0}}
+\headcommand {\beamer@framepages {17}{23}}
+\headcommand {\beamer@subsectionentry {0}{3}{2}{24}{Upload and Download}}\headcommand {\beamer@subsectionpages {17}{23}}
+\headcommand {\slideentry {3}{2}{1}{24/24}{Upload and Download}{0}}
+\headcommand {\beamer@framepages {24}{24}}
+\headcommand {\sectionentry {4}{Further Development}{25}{Further Development}{0}}
+\headcommand {\beamer@sectionpages {16}{24}}
+\headcommand {\beamer@subsectionpages {24}{24}}
+\headcommand {\beamer@subsectionentry {0}{4}{1}{25}{What we are going to do in the future}}\headcommand {\beamer@subsectionpages {25}{24}}
+\headcommand {\slideentry {4}{1}{1}{25/25}{What we are going to do in the future}{0}}
 \headcommand {\beamer@framepages {25}{25}}
-\headcommand {\sectionentry {4}{Further Development}{26}{Further Development}{0}}
-\headcommand {\beamer@sectionpages {17}{25}}
+\headcommand {\beamer@partpages {1}{25}}
 \headcommand {\beamer@subsectionpages {25}{25}}
-\headcommand {\beamer@subsectionentry {0}{4}{1}{26}{What we are going to do in the future}}\headcommand {\beamer@subsectionpages {26}{25}}
-\headcommand {\slideentry {4}{1}{1}{26/26}{What we are going to do in the future}{0}}
-\headcommand {\beamer@framepages {26}{26}}
-\headcommand {\beamer@partpages {1}{26}}
-\headcommand {\beamer@subsectionpages {26}{26}}
-\headcommand {\beamer@sectionpages {26}{26}}
-\headcommand {\beamer@documentpages {26}}
-\headcommand {\def \inserttotalframenumber {14}}
+\headcommand {\beamer@sectionpages {25}{25}}
+\headcommand {\beamer@documentpages {25}}
+\headcommand {\def \inserttotalframenumber {13}}
